@@ -30,7 +30,7 @@
 
 <style scoped>
 .header {
-  background-color: #1e1e1e;
+  background-color: transparent;
   padding: 10px 20px;
   display: flex;
   justify-content: space-between;
@@ -41,7 +41,7 @@
 .logo {
   color: #00ff88;
   font-weight: bold;
-  font-size: 1.5rem;
+  font-size: 2.0rem;
 }
 
 .nav-links {
@@ -52,7 +52,7 @@
 }
 
 .nav-links a {
-  color: white;
+  color: lawngreen;
   text-decoration: none;
   transition: color 0.2s;
 }
@@ -64,7 +64,7 @@
 .account-dropdown {
   position: relative;
   cursor: pointer;
-  color: white;
+  color: lawngreen;
 }
 
 .account-dropdown:hover .dropdown-menu {
@@ -86,12 +86,12 @@
 
 .dropdown-menu a {
   padding: 10px;
-  color: white;
+  color: lawngreen;
   text-decoration: none;
 }
 
 .dropdown-menu a:hover {
   background-color: #00ff88;
-  color: #121212;
+  color: black;
 }
 </style>
