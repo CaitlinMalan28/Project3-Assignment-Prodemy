@@ -2,29 +2,46 @@
   <div class="home">
     <section class="hero">
       <h1>Welcome to <span class="brand">Prodemy</span></h1>
-      <p>Your platform to learn, grow, and master productivity skills.</p>
+      <p>Your space to grow, learn, and build skills that actually matter.</p>
       <router-link to="/signup" class="cta">Get Started</router-link>
+    </section>
+
+    <section class="intro">
+      <p>
+        You don’t need more motivation — you need structure. Prodemy combines focused learning with practical tools
+        that help you stay consistent. Whether you're studying part-time, coding after hours, or juggling work and class —
+        we've built this for you.
+      </p>
+
+      <p>
+        Here you’ll find courses built for momentum, not confusion. A community that helps, not distracts.
+        And projects that prepare you for the real world — not just final exams.
+      </p>
+
+      <p>
+        This isn’t just another platform. This is where progress becomes a habit.
+      </p>
     </section>
 
     <section class="features">
       <div class="feature-card">
         <h2>📚 Courses</h2>
-        <p>Access curated learning paths designed to boost your productivity and tech skills.</p>
+        <p>Curated paths in productivity, web development, Python, and more — built with clarity and purpose.</p>
       </div>
       <div class="feature-card">
         <h2>👥 Community</h2>
-        <p>Join like-minded learners and grow together in our interactive community space.</p>
+        <p>Get support, share ideas, and grow with other students and developers walking the same road.</p>
       </div>
       <div class="feature-card">
         <h2>🚀 Projects</h2>
-        <p>Work on real-world tasks that enhance your resume and build your confidence.</p>
+        <p>Build actual projects that help you learn faster and showcase your skills — not just theory.</p>
       </div>
     </section>
   </div>
 </template>
 
 <script setup>
-// No JS needed yet
+// No logic needed yet
 </script>
 
 <style scoped>
@@ -69,6 +86,15 @@
 
 .cta:hover {
   background-color: #00cc66;
+}
+
+.intro {
+  max-width: 800px;
+  margin-bottom: 60px;
+  font-size: 1.1rem;
+  color: #ccc;
+  line-height: 1.8;
+  text-align: left;
 }
 
 .features {

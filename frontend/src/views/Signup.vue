@@ -3,25 +3,34 @@
     <div class="form-section">
       <h2>Get Started Now</h2>
       <p>Manage your tasks. Master your learning. Achieve more with Prodemy!</p>
+
       <form @submit.prevent="handleSignup">
         <input v-model="name" type="text" placeholder="Name" required />
         <input v-model="email" type="email" placeholder="Email address" required />
         <input v-model="password" type="password" placeholder="Password" required />
+
         <div class="checkbox">
           <input v-model="agreed" type="checkbox" id="terms" />
           <label for="terms">I agree to the terms & policy</label>
         </div>
+
         <button type="submit">Signup</button>
       </form>
+
       <div class="divider"><span>OR</span></div>
+
       <div class="social-login">
         <button class="google">Sign in with Google</button>
         <button class="apple">Sign in with Apple</button>
       </div>
-      <p class="signin-link">Have an account? <router-link to="/login">Sign in</router-link></p>
+
+      <p class="signin-link">
+        Have an account? <router-link to="/login">Sign in</router-link>
+      </p>
     </div>
+
     <div class="graphic-section">
-      <img :src="logo" alt="Logo Graphic" />
+      <img :src="logo" alt="Prodemy Graphic" />
     </div>
   </div>
 </template>
@@ -52,17 +61,20 @@ const handleSignup = () => {
   background: #0d0d0d;
   color: #fff;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  border-radius: 20px;
+  overflow: hidden;
 }
 
 .form-section {
   flex: 1;
   padding: 60px;
-  background-color: #9EFF80;
+  background-color: #9eff80;
   color: #121212;
   display: flex;
   flex-direction: column;
   justify-content: center;
   max-width: 600px;
+  border-radius: 20px 0 0 20px;
 }
 
 .form-section h2 {
@@ -75,17 +87,30 @@ const handleSignup = () => {
   margin-bottom: 30px;
   font-weight: 500;
   color: #2b2b2b;
+  font-size: 1rem;
 }
 
 form input {
   width: 100%;
   padding: 14px 16px;
   margin-bottom: 15px;
-  border: none;
-  border-radius: 8px;
+  border: 1px solid #ccc;
+  border-radius: 14px;
   font-size: 1rem;
-  background-color: #f2f2f2;
+  background-color: #f6f6f6;
   color: #121212;
+  transition: all 0.25s ease;
+}
+
+form input:focus {
+  outline: none;
+  border-color: #5cae29;
+  box-shadow: 0 0 6px #5cae2966;
+  background-color: #fff;
+}
+
+form input:hover {
+  border-color: #5cae29;
 }
 
 form input::placeholder {
@@ -102,6 +127,14 @@ form input::placeholder {
 .checkbox input {
   margin-right: 10px;
   accent-color: #5cae29;
+  width: 18px;
+  height: 18px;
+  border-radius: 6px;
+}
+
+.checkbox label {
+  font-size: 0.95rem;
+  color: #333;
 }
 
 button {
@@ -110,23 +143,25 @@ button {
   border: none;
   padding: 14px;
   width: 100%;
-  border-radius: 8px;
+  border-radius: 14px;
   cursor: pointer;
   font-weight: bold;
   font-size: 1rem;
-  transition: background 0.3s ease;
+  transition: background 0.3s ease, transform 0.2s ease;
 }
 
 button:hover {
   background-color: #489c1f;
+  transform: translateY(-1px);
 }
 
 .divider {
   text-align: center;
-  margin: 20px 0;
+  margin: 30px 0 20px;
   position: relative;
   font-weight: 600;
   color: #444;
+  font-size: 0.9rem;
 }
 
 .divider::before,
@@ -149,9 +184,10 @@ button:hover {
 
 .divider span {
   padding: 0 10px;
-  background: #9EFF80;
+  background: #9eff80;
   z-index: 1;
   position: relative;
+  border-radius: 12px;
 }
 
 .social-login button {
@@ -161,7 +197,7 @@ button:hover {
   font-weight: bold;
   font-size: 0.95rem;
   border: none;
-  border-radius: 8px;
+  border-radius: 14px;
   cursor: pointer;
   transition: all 0.3s ease;
 }
@@ -188,6 +224,7 @@ button:hover {
   text-align: center;
   margin-top: 25px;
   font-size: 0.95rem;
+  color: #333;
 }
 
 .signin-link a {
@@ -199,6 +236,7 @@ button:hover {
 .signin-link a:hover {
   text-decoration: underline;
 }
+
 .graphic-section {
   flex: 1;
   background-color: #0d0d0d;
@@ -206,7 +244,7 @@ button:hover {
   justify-content: center;
   align-items: center;
   overflow: hidden;
-  position: relative;
+  border-radius: 0 20px 20px 0;
 }
 
 .graphic-section img {
@@ -214,6 +252,6 @@ button:hover {
   height: 100%;
   object-fit: cover;
   object-position: center;
+  border-radius: 0 20px 20px 0;
 }
 </style>
-
