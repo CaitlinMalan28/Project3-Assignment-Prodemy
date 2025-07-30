@@ -7,6 +7,13 @@
       <form @submit.prevent="handleLogin">
         <input v-model="email" type="email" placeholder="Email address" required />
         <input v-model="password" type="password" placeholder="Password" required />
+
+        <select v-model="role" required>
+          <option value="" disabled selected>Select your role</option>
+          <option value="USER">Customer</option>
+          <option value="ADMIN">Admin</option>
+        </select>
+
         <button type="submit">Login</button>
       </form>
 
@@ -18,27 +25,57 @@
       </div>
 
       <p class="signup-link">
-        New to Prodemy? <router-link to="/signup">Create an account</router-link>
+        Don't have an account? <router-link to="/signup">Create one</router-link>
       </p>
     </div>
 
     <div class="graphic-section">
-      <img :src="logo" alt="Prodemy Visual" />
+      <img :src="logo" alt="Prodemy Login Graphic" />
     </div>
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue'
+import axios from 'axios'
 import logo from '@/assets/logo.png'
 
 const email = ref('')
 const password = ref('')
+const role = ref('')
 
-const handleLogin = () => {
-  alert(`Logged in with\nEmail: ${email.value}`)
+const handleLogin = async () => {
+  if (!email.value || !password.value || !role.value) {
+    alert('Please fill in all fields including role')
+    return
+  }
+
+  let endpoint = ''
+  if (role.value === 'ADMIN') {
+    endpoint = 'http://localhost:8080/admin/login'
+  } else if (role.value === 'USER') {
+    endpoint = 'http://localhost:8080/customers/login'
+  } else {
+    alert('Invalid role selected')
+    return
+  }
+
+  try {
+    const response = await axios.post(endpoint, {
+      email: email.value,
+      password: password.value,
+    })
+
+    console.log('Login success:', response.data)
+    alert('Login successful!')
+    // you can redirect the user or store token here
+  } catch (error) {
+    console.error('Login failed:', error)
+    alert('Login failed. Please check your credentials.')
+  }
 }
 </script>
+
 
 <style scoped>
 .login-container {
@@ -77,7 +114,8 @@ const handleLogin = () => {
   font-size: 1rem;
 }
 
-form input {
+form input,
+form select {
   width: 100%;
   padding: 14px 16px;
   margin-bottom: 15px;
@@ -89,6 +127,7 @@ form input {
   transition: all 0.25s ease;
 }
 
+form select:focus,
 form input:focus {
   outline: none;
   border-color: #5cae29;
@@ -96,6 +135,7 @@ form input:focus {
   background-color: #fff;
 }
 
+form select:hover,
 form input:hover {
   border-color: #5cae29;
 }
