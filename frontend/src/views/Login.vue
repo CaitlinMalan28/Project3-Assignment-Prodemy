@@ -52,7 +52,7 @@ const handleLogin = async () => {
 
   let endpoint = ''
   if (role.value === 'ADMIN') {
-    endpoint = 'http://localhost:8080/admin/login'
+    endpoint = 'http://localhost:8080/admins/login'
   } else if (role.value === 'USER') {
     endpoint = 'http://localhost:8080/customers/login'
   } else {
