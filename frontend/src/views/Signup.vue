@@ -1,57 +1,103 @@
 <template>
   <div class="signup-container">
     <div class="form-section">
-      <h2>Get Started Now</h2>
-      <p>Manage your tasks. Master your learning. Achieve more with Prodemy!</p>
+      <h2>Create Your Account</h2>
+      <p>Join Prodemy and start your learning journey</p>
 
       <form @submit.prevent="handleSignup">
-        <input v-model="name" type="text" placeholder="Name" required />
+        <input v-model="firstName" type="text" placeholder="First Name" required />
+        <input v-model="lastName" type="text" placeholder="Last Name" required />
         <input v-model="email" type="email" placeholder="Email address" required />
         <input v-model="password" type="password" placeholder="Password" required />
+        <input v-model="confirmPassword" type="password" placeholder="Confirm Password" required />
 
-        <div class="checkbox">
-          <input v-model="agreed" type="checkbox" id="terms" />
-          <label for="terms">I agree to the terms & policy</label>
-        </div>
+        <select v-model="role" required>
+          <option disabled value="">Select your role</option>
+          <option value="USER">Customer</option>
+          <option value="ADMIN">Admin</option>
+        </select>
 
-        <button type="submit">Signup</button>
+        <label class="checkbox">
+          <input type="checkbox" v-model="agreed" required />
+          I agree to the terms and conditions
+        </label>
+
+        <button type="submit">Sign Up</button>
       </form>
 
-      <div class="divider"><span>OR</span></div>
-
-      <div class="social-login">
-        <button class="google">Sign in with Google</button>
-        <button class="apple">Sign in with Apple</button>
-      </div>
-
-      <p class="signin-link">
-        Have an account? <router-link to="/login">Sign in</router-link>
+      <p class="login-link">
+        Already have an account? <router-link to="/login">Log in</router-link>
       </p>
     </div>
 
     <div class="graphic-section">
-      <img :src="logo" alt="Prodemy Graphic" />
+      <img :src="logo" alt="Prodemy Signup Graphic" />
     </div>
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue'
+import axios from 'axios'
 import logo from '@/assets/logo.png'
 
-const name = ref('')
+const firstName = ref('')
+const lastName = ref('')
 const email = ref('')
 const password = ref('')
+const confirmPassword = ref('')
+const role = ref('')
 const agreed = ref(false)
 
-const handleSignup = () => {
-  if (!agreed.value) {
-    alert('You must agree to the terms.')
+const handleSignup = async () => {
+  if (!firstName.value || !lastName.value || !email.value || !password.value || !confirmPassword.value || !role.value || !agreed.value) {
+    alert('Please fill in all fields and agree to the terms.')
     return
   }
-  alert(`Signup successful!\nName: ${name.value}\nEmail: ${email.value}`)
+
+  if (password.value !== confirmPassword.value) {
+    alert('Passwords do not match.')
+    return
+  }
+
+  let endpoint = ''
+  if (role.value === 'ADMIN') {
+    endpoint = 'http://localhost:8080/admins/register'  // note: changed from /login
+  } else if (role.value === 'USER') {
+    endpoint = 'http://localhost:8080/customers/register'  // changed from /login
+  } else {
+    alert('Invalid role selected')
+    return
+  }
+
+  try {
+    const response = await axios.post(endpoint, {
+      firstName: firstName.value,
+      lastName: lastName.value,
+      email: email.value,
+      password: password.value,
+      confirmPassword: confirmPassword.value,  // include if backend expects it
+      role: role.value
+    }, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+
+    alert('Account created successfully!')
+    window.location.href = '/'  // or wherever you want to redirect
+  } catch (error) {
+    console.error('Signup failed:', error)
+    // Show detailed error if backend sends it
+    if (error.response && error) {
+      alert('Signup failed: ' + error)
+    } else {
+      alert('Signup failed. Please try again.' + error)
+    }
+  }
 }
 </script>
+
 
 <style scoped>
 .signup-container {
@@ -90,7 +136,8 @@ const handleSignup = () => {
   font-size: 1rem;
 }
 
-form input {
+form input,
+form select {
   width: 100%;
   padding: 14px 16px;
   margin-bottom: 15px;
@@ -99,42 +146,28 @@ form input {
   font-size: 1rem;
   background-color: #f6f6f6;
   color: #121212;
-  transition: all 0.25s ease;
-}
-
-form input:focus {
-  outline: none;
-  border-color: #5cae29;
-  box-shadow: 0 0 6px #5cae2966;
-  background-color: #fff;
-}
-
-form input:hover {
-  border-color: #5cae29;
 }
 
 form input::placeholder {
   color: #777;
 }
 
+form input:focus,
+form select:focus {
+  outline: none;
+  border-color: #5cae29;
+  box-shadow: 0 0 6px #5cae2966;
+  background-color: #fff;
+}
+
 .checkbox {
-  display: flex;
-  align-items: center;
-  margin-bottom: 20px;
-  font-size: 0.95rem;
+  margin-bottom: 15px;
+  font-size: 0.9rem;
+  color: #333;
 }
 
 .checkbox input {
-  margin-right: 10px;
-  accent-color: #5cae29;
-  width: 18px;
-  height: 18px;
-  border-radius: 6px;
-}
-
-.checkbox label {
-  font-size: 0.95rem;
-  color: #333;
+  margin-right: 8px;
 }
 
 button {
@@ -155,85 +188,20 @@ button:hover {
   transform: translateY(-1px);
 }
 
-.divider {
-  text-align: center;
-  margin: 30px 0 20px;
-  position: relative;
-  font-weight: 600;
-  color: #444;
-  font-size: 0.9rem;
-}
-
-.divider::before,
-.divider::after {
-  content: '';
-  position: absolute;
-  height: 1px;
-  background-color: #bbb;
-  top: 50%;
-  width: 40%;
-}
-
-.divider::before {
-  left: 0;
-}
-
-.divider::after {
-  right: 0;
-}
-
-.divider span {
-  padding: 0 10px;
-  background: #9eff80;
-  z-index: 1;
-  position: relative;
-  border-radius: 12px;
-}
-
-.social-login button {
-  width: 100%;
-  margin-bottom: 10px;
-  padding: 12px;
-  font-weight: bold;
-  font-size: 0.95rem;
-  border: none;
-  border-radius: 14px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.google {
-  background-color: white;
-  color: #333;
-}
-
-.google:hover {
-  background-color: #e5e5e5;
-}
-
-.apple {
-  background-color: #000;
-  color: white;
-}
-
-.apple:hover {
-  background-color: #333;
-}
-
-.signin-link {
+.login-link {
   text-align: center;
   margin-top: 25px;
   font-size: 0.95rem;
   color: #333;
 }
 
-.signin-link a {
+.login-link a {
   color: #007bff;
   text-decoration: none;
   font-weight: bold;
 }
 
-.signin-link a:hover {
+.login-link a:hover {
   text-decoration: underline;
 }
 

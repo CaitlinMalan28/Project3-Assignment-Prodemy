@@ -1,86 +1,219 @@
 <template>
-  <div class="dashboard">
-    <h1>Welcome back, {{ user.name }} 👋</h1>
+  <div class="dashboard-page">
+    <h1>Welcome back, {{ user.name }}!</h1>
 
-    <section class="progress-section">
-      <h2>Your Progress</h2>
-      <div class="progress-bar">
-        <div class="progress-fill" :style="{ width: user.progress + '%' }"></div>
-      </div>
-      <p>{{ user.progress }}% completed</p>
-    </section>
+    <!-- ADMIN VIEW -->
+    <div v-if="user.role === 'ADMIN'" class="admin-section">
+      <h2>📊 Admin Dashboard</h2>
+      <p>Manage platform-wide content and oversee course engagement.</p>
 
-    <section class="courses-section">
-      <h2>Enrolled Courses</h2>
-      <div v-if="courses.length" class="courses-grid">
+      <!-- Admin Tools -->
+      <div class="admin-tools">
+        <div class="admin-tool">
+          <h3>User Management</h3>
+          <p>View, add, or manage users (students, instructors).</p>
+          <button class="admin-btn" @click="goTo('/admin/users')">Go to Users</button>
+        </div>
+
+        <div class="admin-tool">
+          <h3>Course Management</h3>
+          <p>Create, update, or remove courses and assign instructors.</p>
+          <button class="admin-btn" @click="goTo('/admin/courses')">Manage Courses</button>
+        </div>
+
+        <div class="admin-tool">
+          <h3>Enrollment Control</h3>
+          <p>Track who’s enrolled and approve or revoke access.</p>
+          <button class="admin-btn" @click="goTo('/admin/enrollments')">Enrollment Dashboard</button>
+        </div>
+
+        <div class="admin-tool">
+          <h3>Reports & Analytics</h3>
+          <p>Monitor student progress, engagement, and completion stats.</p>
+          <button class="admin-btn" @click="goTo('/admin/reports')">View Reports</button>
+        </div>
       </div>
-      <p v-else>You haven’t enrolled in any courses yet.</p>
-    </section>
+    </div>
+
+
+    <!-- CUSTOMER VIEW -->
+    <div v-else class="courses-page">
+      <h2>Explore <span class="brand">Courses</span></h2>
+      <p class="subtitle">Boost your skills with our curated productivity and tech tracks.</p>
+
+      <div class="courses-grid">
+        <div class="course-card" v-for="course in courses" :key="course.id">
+          <img :src="course.image" :alt="course.title" class="course-image" />
+          <h3>{{ course.title }}</h3>
+          <p>{{ course.description }}</p>
+          <router-link :to="`/courses/${course.id}`" class="enroll-btn">View Course</router-link>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
+import productivityM from '@/assets/productivityM.jpg'
+import webDevelopment from '@/assets/webDevelopment.jpg'
+import time from '@/assets/time.jpg'
+import python from '@/assets/python.jpg'
+import application from '@/assets/application.jpg'
+import professionalE from '@/assets/professionalE.jpg'
 
+// Simulate logged-in user
 const user = {
   name: 'Philani',
-  progress: 45 // Example static value
+  role: 'ADMIN' // or 'ADMIN'
 }
 
 const courses = [
   {
     id: 1,
-    title: 'Web Development Essentials',
-    description: 'Learn HTML, CSS, and JavaScript.',
-    image: '@/assets/webDevelopment.jpg'
+    title: "Productivity Mastery",
+    description: "Learn powerful strategies and tools to manage your time and tasks efficiently.",
+    image: productivityM
   },
   {
     id: 2,
-    title: 'Introduction to Python',
-    description: 'Start your Python journey.',
-    image: '@/assets/python.jpg'
-  }
-]
+    title: "Web Development Essentials",
+    description: "Master HTML, CSS, and JavaScript to build responsive and interactive websites.",
+    image: webDevelopment
+  },
+  {
+    id: 3,
+    title: "Time Management Techniques",
+    description: "Explore proven methods like Pomodoro, Eisenhower Matrix, and more.",
+    image: time
+  },
+  {
+    id: 4,
+    title: "Introduction to Python",
+    description: "Start coding with Python and build your foundation in programming.",
+    image: python
+  },
+  {
+    id: 5,
+    title: "Introduction to Application Development",
+    description: "Start learning ADP module and build your foundation in programming.",
+    image: application
+  },
+  {
+    id: 6,
+    title: "Professional Essentials",
+    description: "Start learning Professional to know everything about programming.",
+    image: professionalE
+  },
+];
 </script>
 
 <style scoped>
-.dashboard {
-  color: white;
+.dashboard-page {
+  max-width: 1100px;
+  margin: 60px auto;
   padding: 20px;
-  max-width: 1000px;
-  margin: auto;
+  color: white;
+  text-align: center;
 }
 
-h1 {
-  font-size: 2rem;
-  margin-bottom: 30px;
+.brand {
+  color: #00ff88;
 }
 
-.progress-section {
-  margin-bottom: 50px;
-}
-
-.progress-bar {
-  background-color: #333;
-  border-radius: 8px;
-  height: 20px;
-  width: 100%;
-  overflow: hidden;
-  margin-top: 10px;
-}
-
-.progress-fill {
-  height: 100%;
-  background-color: #00ff88;
-  transition: width 0.3s ease-in-out;
-}
-
-.courses-section h2 {
-  margin-bottom: 20px;
+.subtitle {
+  color: #ccc;
+  margin-bottom: 40px;
 }
 
 .courses-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 20px;
+  justify-content: center;
+  gap: 30px;
 }
+
+.course-card {
+  background-color: #1e1e1e;
+  border: 1px solid #00ff88;
+  border-radius: 12px;
+  padding: 20px;
+  width: 280px;
+  text-align: left;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.course-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0 15px #00ff8855;
+}
+
+.course-image {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  border-radius: 10px;
+  margin-bottom: 12px;
+  box-shadow: 0 0 10px #00000055;
+}
+
+.enroll-btn {
+  display: inline-block;
+  margin-top: 15px;
+  padding: 8px 16px;
+  background-color: #00ff88;
+  color: #121212;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background 0.3s;
+}
+
+.enroll-btn:hover {
+  background-color: #00cc66;
+}
+
+.admin-section {
+  background-color:  rgba(28, 28, 28, 0.5);
+  padding: 30px;
+  border-radius: 14px;
+  border: 1px solid #00ff88;
+  box-shadow: 0 0 15px #00ff8844;
+}
+.admin-tools {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin-top: 30px;
+  text-align: left;
+}
+
+.admin-tool {
+  background-color: #2a2a2a;
+  padding: 20px;
+  border-radius: 10px;
+  border: 1px solid #00ff88;
+  box-shadow: 0 0 10px #00ff8822;
+}
+
+.admin-tool h3 {
+  margin-bottom: 10px;
+  color: #00ff88;
+}
+
+.admin-btn {
+  margin-top: 15px;
+  background-color: #00ff88;
+  color: #121212;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.admin-btn:hover {
+  background-color: #00cc66;
+}
+
 </style>
