@@ -11,7 +11,7 @@
         <span>Account ▾</span>
         <div class="dropdown-menu">
           <router-link to="/dashboard">Dashboard</router-link>
-          <router-link to="/Courses">My Courses</router-link>
+          <router-link to="/CourseManagement">Manage Courses</router-link>
           <router-link to="/lesson/1">Lesson Player (sample)</router-link>
           <router-link to="/profile">Profile / Settings</router-link>
           <router-link to="/contact">Support</router-link>

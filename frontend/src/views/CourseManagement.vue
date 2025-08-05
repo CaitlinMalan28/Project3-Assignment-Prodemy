@@ -1,59 +1,35 @@
 <template>
-  <div class="course-management">
-    <h1>Manage Courses</h1>
+  <div class="course-manager">
+    <h1>Course Management</h1>
 
-    <section class="new-course">
-      <h2>Create / Edit Course</h2>
-      <form @submit.prevent="handleSubmit">
-        <div class="field">
-          <label>Title</label>
-          <input v-model="title" type="text" placeholder="Course title" required />
+    <form @submit.prevent="handleSubmit">
+      <input v-model="form.title" type="text" placeholder="Course Title" required />
+      <textarea v-model="form.description" placeholder="Course Description" required></textarea>
+      <input type="file" @change="handleFileChange" accept="image/*,video/*,.pdf" />
+
+      <button type="submit">{{ editing ? 'Update' : 'Add' }} Course</button>
+    </form>
+
+    <div class="course-list">
+      <h2>Available Courses</h2>
+      <div v-if="courses.length === 0">No courses available.</div>
+
+      <div v-for="course in courses" :key="course.id" class="course-card">
+        <h3>{{ course.title }}</h3>
+        <p>{{ course.description }}</p>
+
+        <div v-if="course.image" class="media-preview">
+          <img v-if="isImage(course.imageType)" :src="getImageUrl(course.id)" alt="Course Image" />
+          <video v-else-if="isVideo(course.imageType)" controls :src="getImageUrl(course.id)" />
+          <a v-else :href="getImageUrl(course.id)" target="_blank">View PDF</a>
         </div>
 
-        <div class="field">
-          <label>Description</label>
-          <textarea v-model="description" placeholder="Course description" rows="3" required></textarea>
-        </div>
-
-        <div class="field">
-          <label>File (image / PDF / video)</label>
-          <input ref="fileInput" type="file" @change="onFileChange" />
-        </div>
-
-        <button type="submit">{{ editing ? 'Update Course' : 'Create Course' }}</button>
-        <button v-if="editing" type="button" class="cancel" @click="resetForm">Cancel</button>
-      </form>
-    </section>
-
-    <section class="existing-courses">
-      <h2>Existing Courses</h2>
-      <div v-if="loading" class="status">Loading courses...</div>
-      <div v-if="error" class="status error">{{ error }}</div>
-      <div class="courses-grid" v-if="courses.length">
-        <div class="course-card" v-for="course in courses" :key="course.id">
-          <div class="info">
-            <h3 contenteditable="false">{{ course.title }}</h3>
-            <p>{{ course.description }}</p>
-          </div>
-          <div class="actions">
-            <button @click="populateEdit(course)">Edit</button>
-            <button class="delete" @click="deleteCourse(course.id)">Delete</button>
-          </div>
-          <div class="preview" v-if="courseHasFile(course)">
-            <template v-if="isImage(course)">
-              <img :src="`${backendBase}/courses/${course.id}/image`" alt="course image" />
-            </template>
-            <template v-else-if="isPdf(course)">
-              <a :href="`${backendBase}/courses/${course.id}/file`" target="_blank">View PDF</a>
-            </template>
-            <template v-else-if="isVideo(course)">
-              <video controls :src="`${backendBase}/courses/${course.id}/file`" />
-            </template>
-          </div>
+        <div class="actions">
+          <button @click="editCourse(course)">Edit</button>
+          <button @click="deleteCourse(course.id)">Delete</button>
         </div>
       </div>
-      <div v-else class="status">No courses available.</div>
-    </section>
+    </div>
   </div>
 </template>
 
@@ -61,232 +37,173 @@
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
 
-// base URL, adjust if you used a different port or path
-const backendBase = 'http://localhost:8080/courses/all'
+const form = ref({
+  id: null,
+  title: '',
+  description: '',
+  image: null
+})
 
 const courses = ref([])
-const loading = ref(false)
-const error = ref('')
-
-const title = ref('')
-const description = ref('')
-const file = ref(null)
 const editing = ref(false)
-const editId = ref(null)
+const backendUrl = 'http://localhost:8080/courses'
 
 const fetchCourses = async () => {
-  loading.value = true
-  error.value = ''
-  try {
-    const res = await axios.get(`${backendBase}/courses/all`)
-    courses.value = res.data
-  } catch (e) {
-    error.value = 'Failed to load courses'
-    console.error(e)
-  } finally {
-    loading.value = false
-  }
-}
-
-onMounted(fetchCourses)
-
-const onFileChange = (e) => {
-  file.value = e.target.files[0]
-}
-
-const resetForm = () => {
-  title.value = ''
-  description.value = ''
-  file.value = null
-  editing.value = false
-  editId.value = null
-  if (refs.fileInput) refs.fileInput.value = ''
+  const response = await axios.get(`${backendUrl}/all`)
+  courses.value = response.data
 }
 
 const handleSubmit = async () => {
-  if (!title.value || !description.value) {
-    alert('Title and description required')
-    return
-  }
-
-  const metadata = {
-    title: title.value,
-    description: description.value,
-  }
-
-  const formData = new FormData()
-  formData.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }))
-  if (file.value) {
-    formData.append('image', file.value) // adapt key name if backend expects different
-  }
-
   try {
-    if (editing.value && editId.value) {
-      // for simplicity, treat edit as create (backend would need update endpoint)
-      await axios.post(`${backendBase}/courses/create`, formData, {
+    const formData = new FormData()
+    formData.append('title', form.value.title)
+    formData.append('description', form.value.description)
+    if (form.value.image) {
+      formData.append('image', form.value.image)
+    }
+
+    if (editing.value) {
+      formData.append('id', form.value.id)
+      await axios.put(`${backendUrl}/update`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       })
     } else {
-      await axios.post(`${backendBase}/courses/create`, formData, {
+      await axios.post(`${backendUrl}/create`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       })
     }
-    alert('Saved successfully')
+
     resetForm()
-    await fetchCourses()
-  } catch (e) {
-    console.error(e)
-    alert('Failed to save course')
+    fetchCourses()
+  } catch (err) {
+    console.error('Failed to submit course:', err.response?.data || err.message)
+    alert('Failed to submit course')
   }
+}
+
+const handleFileChange = (e) => {
+  const file = e.target.files[0]
+  if (!file) return
+  form.value.image = file
 }
 
 const deleteCourse = async (id) => {
-  if (!confirm('Delete this course?')) return
-  try {
-    await axios.delete(`${backendBase}/courses/${id}`)
-    await fetchCourses()
-  } catch (e) {
-    console.error(e)
-    alert('Failed to delete')
+  await axios.delete(`${backendUrl}/delete/${id}`)
+  fetchCourses()
+}
+
+const editCourse = (course) => {
+  form.value = {
+    id: course.id,
+    title: course.title,
+    description: course.description,
+    image: null // Must re-upload file if editing
   }
-}
-
-const populateEdit = (course) => {
-  title.value = course.title
-  description.value = course.description
   editing.value = true
-  editId.value = course.id
 }
 
-const courseHasFile = (course) => {
-  // naive: assume if course has any non-null binary field; adjust if you have metadata about file types
-  return true
+const resetForm = () => {
+  form.value = {
+    id: null,
+    title: '',
+    description: '',
+    image: null
+  }
+  editing.value = false
 }
 
-// heuristics based on extension stored separately if available
-const isImage = (course) => true // stub, refine if you store mime/type
-const isPdf = (course) => false
-const isVideo = (course) => false
+// Helper to detect media types
+const isImage = (type) => type && type.startsWith('image')
+const isVideo = (type) => type && type.startsWith('video')
+
+// Use a backend endpoint to serve images (needs to be created)
+const getImageUrl = (id) => `${backendUrl}/media/${id}`
+
+onMounted(fetchCourses)
 </script>
 
 <style scoped>
-.course-management {
-  max-width: 1000px;
-  margin: 40px auto;
+.course-manager {
   padding: 20px;
+  max-width: 800px;
+  margin: auto;
   color: white;
-  font-family: 'Segoe UI', sans-serif;
+  background: #121212;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.5);
 }
 
-h1 {
-  font-size: 2.5rem;
-  margin-bottom: 10px;
-}
-
-h2 {
-  margin-top: 30px;
-  margin-bottom: 15px;
-}
-
-.new-course,
-.existing-courses {
-  background: #1f1f1f;
-  padding: 20px;
-  border-radius: 12px;
+form {
   margin-bottom: 30px;
 }
 
-.field {
-  margin-bottom: 12px;
-}
-
-.field label {
+input[type="text"],
+textarea,
+input[type="file"] {
   display: block;
-  margin-bottom: 4px;
-  font-weight: 600;
+  width: 100%;
+  margin-bottom: 15px;
+  padding: 10px;
+  background: #2a2a2a;
+  color: white;
+  border: none;
+  border-radius: 4px;
 }
 
-.field input,
-.field textarea {
-  width: 100%;
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid #444;
-  background: #0d0d0d;
-  color: white;
+textarea {
+  resize: vertical;
+  min-height: 80px;
 }
 
 button {
+  padding: 10px 20px;
   background: #00ff88;
   border: none;
-  padding: 12px 20px;
-  border-radius: 8px;
+  border-radius: 4px;
+  color: #121212;
   font-weight: bold;
   cursor: pointer;
-  margin-right: 10px;
-  margin-top: 5px;
+  transition: background 0.3s;
 }
 
-button.cancel {
-  background: #888;
+button:hover {
+  background: #00e67a;
 }
 
-.courses-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
+.course-list {
+  margin-top: 30px;
 }
 
 .course-card {
-  background: #0f0f0f;
-  border: 1px solid #00ff88;
-  padding: 16px;
-  border-radius: 10px;
-  width: 260px;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  background: #1e1e1e;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 6px;
+  box-shadow: 0 0 5px rgba(0,0,0,0.3);
 }
 
 .course-card h3 {
-  margin: 0;
+  margin: 0 0 10px 0;
 }
 
-.actions {
-  display: flex;
-  gap: 6px;
+.course-card p {
+  margin-bottom: 10px;
+  color: #ccc;
+}
+
+.media-preview img,
+.media-preview video {
+  max-width: 100%;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+
+.media-preview a {
+  color: #00ff88;
+  text-decoration: underline;
 }
 
 .actions button {
-  flex: 1;
-  font-size: 0.8rem;
-}
-
-.delete {
-  background: #ff4d4f;
-  color: white;
-}
-
-.preview img {
-  width: 100%;
-  border-radius: 6px;
-  margin-top: 6px;
-  object-fit: cover;
-}
-
-.preview video {
-  width: 100%;
-  margin-top: 6px;
-  border-radius: 6px;
-}
-
-.status {
-  padding: 12px;
-  margin-bottom: 12px;
-}
-
-.error {
-  background: #822;
+  margin-right: 10px;
 }
 </style>
