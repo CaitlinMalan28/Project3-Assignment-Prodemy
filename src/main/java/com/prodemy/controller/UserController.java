@@ -2,6 +2,7 @@ package com.prodemy.controller;
 
 
 
+import com.prodemy.model.User;
 import com.prodemy.service.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.http.*;

@@ -2,6 +2,7 @@ package com.prodemy.dto;
 
 import org.hibernate.validator.constraints.*;
 
+import javax.annotation.Priority;
 import javax.validation.constraints.NotNull;
 
 public class TaskDTO {
@@ -11,3 +12,4 @@ public class TaskDTO {
     @NotNull
     private Priority priority;
 }
+
