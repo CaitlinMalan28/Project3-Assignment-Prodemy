@@ -9,6 +9,10 @@ import MyCourses from '../views/CourseManagement.vue'
 import LessonPlayer from '../views/LessonPlayer.vue'
 import ProfileSettings from '../views/ProfileSettings.vue'
 import ContactSupport from '../views/ContactSupport.vue'
+import Analytics from "@/views/Analytics.vue";
+import UserManagement from "@/views/UserManagement.vue";
+import EnrollmentDashboard from "@/views/EnrollmentDashboard.vue";
+import StudentEnrollment from "@/views/StudentEnrollment.vue";
 
 const routes = [
     { path: '/', name: 'Home', component: Home },
@@ -21,6 +25,10 @@ const routes = [
     { path: '/lesson/:lessonId', name: 'LessonPlayer', component: LessonPlayer },
     { path: '/profile', name: 'ProfileSettings', component: ProfileSettings },
     { path: '/contact', name: 'ContactSupport', component: ContactSupport },
+    { path: '/analytics', name: 'Analytics', component: Analytics },
+    { path: '/enrollment', name: 'EnrollmentDashboard', component: EnrollmentDashboard },
+    { path: '/StudentEnrollment', name: 'StudentEnrollment', component: StudentEnrollment },
+    { path: '/UserManagement', name: 'UserManagement', component: UserManagement },
 ]
 
 const router = createRouter({

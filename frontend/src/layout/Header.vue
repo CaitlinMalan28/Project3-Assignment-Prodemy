@@ -6,6 +6,7 @@
       <router-link to="/courses">Courses</router-link>
       <router-link to="/about-us">About Us</router-link>
       <router-link to="/contact">Contact</router-link>
+      <router-link to="/analytics">Analytics</router-link>
 
       <div class="account-dropdown">
         <span>Account ▾</span>
@@ -17,6 +18,7 @@
           <router-link to="/contact">Support</router-link>
           <router-link to="/login">Login</router-link>
           <router-link to="/signup">Signup</router-link>
+          <router-link to="/StudentEnrollment">Student Enrollment</router-link>
         </div>
       </div>
     </nav>
@@ -24,7 +26,10 @@
 </template>
 
 <script setup>
-// You can later use authentication state to hide login/signup
+import { ref } from 'vue'
+
+// Simulated authentication state
+const isAuthenticated = ref(false)
 </script>
 
 <style scoped>

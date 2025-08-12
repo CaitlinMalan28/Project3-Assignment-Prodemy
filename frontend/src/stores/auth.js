@@ -4,55 +4,60 @@ import axios from 'axios'
 import router from '@/router'
 
 export const useAuthStore = defineStore('auth', () => {
-  // state: Load user data from localStorage to keep them logged in across browser sessions
+  // state
   const user = ref(JSON.parse(localStorage.getItem('user')))
-  const token = ref(localStorage.getItem('token'))
 
-  // getters: Computed properties to easily check auth status and roles
-  const isAuthenticated = computed(() => !!token.value && !!user.value)
+  // getters
+  const isAuthenticated = computed(() => !!user.value)
   const isAdmin = computed(() => isAuthenticated.value && user.value?.role === 'ADMIN')
-  const isUser = computed(() => isAuthenticated.value && user.value?.role === 'USER')
+  const isCustomer = computed(() => isAuthenticated.value && user.value?.role === 'CUSTOMER')
 
   // actions
-  function setAuthData(userData, userToken) {
+  function setAuthData(userData) {
     user.value = userData
-    token.value = userToken
-    // Store in localStorage for persistence
     localStorage.setItem('user', JSON.stringify(userData))
-    localStorage.setItem('token', userToken)
   }
 
   function clearAuthData() {
     user.value = null
-    token.value = null
     localStorage.removeItem('user')
-    localStorage.removeItem('token')
   }
 
   async function login(email, password, role) {
-    // API endpoint logic remains here as requested
-    const endpoint = role === 'ADMIN' ? 'http://localhost:8080/admins/login' : 'http://localhost:8080/customers/login'
-    const response = await axios.post(endpoint, { email, password })
+    try {
+      const endpoint = role === 'ADMIN'
+          ? 'http://localhost:8080/admins/login'
+          : 'http://localhost:8080/customers/login'
 
-    // Assuming backend returns { token: '...', user: { ... } }
-    // We manually add the role to the user object for consistency
-    const { token: userToken, user: userData } = response.data
-    setAuthData({ ...userData, role }, userToken)
+      const response = await axios.post(endpoint, { email, password })
+      const userData = response.data
 
-    // Redirect based on role after successful login
-    if (role === 'ADMIN') {
-      router.push({ name: 'ReportAnalytics' }) // Or your main admin dashboard
-    } else {
-      router.push({ name: 'Dashboard' })
+      // Set the role explicitly
+      setAuthData({ ...userData, role })
+
+      // Redirect based on role
+      if (role === 'ADMIN') {
+        router.push({ name: 'ReportAnalytics' })
+      } else {
+        router.push({ name: 'Dashboard' })
+      }
+    } catch (error) {
+      clearAuthData()
+      throw new Error('Login failed. Please check your credentials.')
     }
   }
 
   async function signup(payload) {
-    const endpoint = payload.role === 'ADMIN' ? 'http://localhost:8080/admins/register' : 'http://localhost:8080/customers/register'
-    await axios.post(endpoint, payload)
+    try {
+      const endpoint = payload.role === 'ADMIN'
+          ? 'http://localhost:8080/admins/register'
+          : 'http://localhost:8080/customers/register'
 
-    // After successful signup, redirect to login page with a success message
-    router.push({ name: 'Login', query: { registered: 'true' } })
+      await axios.post(endpoint, payload)
+      router.push({ name: 'Login', query: { registered: 'true' } })
+    } catch (error) {
+      throw new Error('Registration failed. Please try again.')
+    }
   }
 
   function logout() {
@@ -62,12 +67,11 @@ export const useAuthStore = defineStore('auth', () => {
 
   return {
     user,
-    token,
     isAuthenticated,
     isAdmin,
-    isUser,
+    isCustomer,
     login,
     signup,
-    logout,
+    logout
   }
 })

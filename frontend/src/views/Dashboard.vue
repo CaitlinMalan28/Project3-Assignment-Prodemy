@@ -12,25 +12,26 @@
         <div class="admin-tool">
           <h3>User Management</h3>
           <p>View, add, or manage users (students, instructors).</p>
-          <button class="admin-btn" @click="goTo('/admin/users')">Go to Users</button>
+          <button class="admin-btn" @click="goTo('/UserManagement')">Go to Users</button>
         </div>
 
         <div class="admin-tool">
           <h3>Course Management</h3>
           <p>Create, update, or remove courses and assign instructors.</p>
-          <button class="admin-btn" @click="goTo('/admin/courses')">Manage Courses</button>
+          <button class="admin-btn" @click="goTo('/CourseManagement')">Manage Courses</button>
+
         </div>
 
         <div class="admin-tool">
           <h3>Enrollment Control</h3>
           <p>Track who’s enrolled and approve or revoke access.</p>
-          <button class="admin-btn" @click="goTo('/admin/enrollments')">Enrollment Dashboard</button>
+          <button class="admin-btn" @click="goTo('/enrollment')">Enrollment Dashboard</button>
         </div>
 
         <div class="admin-tool">
           <h3>Reports & Analytics</h3>
           <p>Monitor student progress, engagement, and completion stats.</p>
-          <button class="admin-btn" @click="goTo('/admin/reports')">View Reports</button>
+          <button class="admin-btn" @click="goTo('/analytics')">View Reports</button>
         </div>
       </div>
     </div>
@@ -54,6 +55,7 @@
 </template>
 
 <script setup>
+import { useRouter } from 'vue-router'
 import productivityM from '@/assets/productivityM.jpg'
 import webDevelopment from '@/assets/webDevelopment.jpg'
 import time from '@/assets/time.jpg'
@@ -61,10 +63,15 @@ import python from '@/assets/python.jpg'
 import application from '@/assets/application.jpg'
 import professionalE from '@/assets/professionalE.jpg'
 
-// Simulate logged-in user
+const router = useRouter()
+
+const goTo = (path) => {
+  router.push(path)
+}
+
 const user = {
   name: 'Philani',
-  role: 'ADMIN' // or 'ADMIN'
+  role: 'ADMIN'
 }
 
 const courses = [
@@ -106,6 +113,7 @@ const courses = [
   },
 ];
 </script>
+
 
 <style scoped>
 .dashboard-page {
