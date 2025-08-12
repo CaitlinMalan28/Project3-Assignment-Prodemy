@@ -2,22 +2,45 @@
   <div class="enrollment-form">
     <h2>Enroll in a Course</h2>
     <form @submit.prevent="submitEnrollment" class="form">
+      <label for="firstName">First Name:</label>
+      <input
+          id="firstName"
+          type="text"
+          v-model="firstName"
+          placeholder="Enter your first name"
+          required
+      />
+
+      <label for="lastName">Last Name:</label>
+      <input
+          id="lastName"
+          type="text"
+          v-model="lastName"
+          placeholder="Enter your last name"
+          required
+      />
+
       <label for="course">Select Course:</label>
-      <select id="course" v-model="selectedCourseId" required>
+      <select id="course" v-model="selectedCourseTitle" required>
         <option disabled value="">-- Please select a course --</option>
-        <option v-for="course in courses" :key="course.id" :value="course.id">
+        <option
+            v-for="course in courses"
+            :key="course.id"
+            :value="course.title"
+        >
           {{ course.title }}
         </option>
       </select>
 
-      <button type="submit" :disabled="loading">
+      <button
+          type="submit"
+          :disabled="loading || !firstName.trim() || !lastName.trim() || !selectedCourseTitle"
+      >
         {{ loading ? 'Submitting...' : 'Enroll' }}
       </button>
     </form>
 
-    <p v-if="message" :class="{'success': success, 'error': !success}">
-      {{ message }}
-    </p>
+    <p v-if="message" :class="{ success: success, error: !success }">{{ message }}</p>
   </div>
 </template>
 
@@ -25,29 +48,32 @@
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
 
+const firstName = ref('')
+const lastName = ref('')
+const selectedCourseTitle = ref('')
 const courses = ref([])
-const selectedCourseId = ref('')
+const loading = ref(false)
 const message = ref('')
 const success = ref(false)
-const loading = ref(false)
-
-// Replace with the actual logged-in student ID dynamically, hardcoded here for example
-const studentId = 5
 
 async function fetchCourses() {
   try {
-    const { data } = await axios.get('http://localhost:8080/courses/all')
-    courses.value = data
+    const res = await axios.get('http://localhost:8080/courses/all')
+    courses.value = res.data
   } catch (err) {
-    console.error('Error fetching courses:', err)
-    message.value = 'Failed to load courses. Please try again later.'
+    message.value = 'Failed to load courses. Please refresh.'
     success.value = false
   }
 }
 
 async function submitEnrollment() {
-  if (!selectedCourseId.value) {
-    message.value = 'Please select a course before submitting.'
+  if (!firstName.value.trim() || !lastName.value.trim()) {
+    message.value = 'Please enter both your first and last name.'
+    success.value = false
+    return
+  }
+  if (!selectedCourseTitle.value) {
+    message.value = 'Please select a course.'
     success.value = false
     return
   }
@@ -57,19 +83,29 @@ async function submitEnrollment() {
 
   try {
     const payload = {
-      customer: { id: studentId },
-      course: { id: selectedCourseId.value },
-      status: 'PENDING'
+      firstName: firstName.value.trim(),
+      lastName: lastName.value.trim(),
+      courseName: selectedCourseTitle.value,
     }
 
-    await axios.post('http://localhost:8080/api/enrollments', payload)
+    const res = await axios.post(
+        'http://localhost:8080/api/enrollments/enroll',
+        payload
+    )
 
-    message.value = 'Enrollment request submitted successfully!'
+    message.value = res.data || 'Enrollment successful!'
     success.value = true
-    selectedCourseId.value = ''
-  } catch (err) {
-    console.error('Error submitting enrollment:', err)
-    message.value = 'Failed to submit enrollment. Please try again.'
+
+    // Clear form
+    firstName.value = ''
+    lastName.value = ''
+    selectedCourseTitle.value = ''
+  } catch (error) {
+    if (error.response && error.response.data) {
+      message.value = error.response.data
+    } else {
+      message.value = 'Network error. Please try again later.'
+    }
     success.value = false
   } finally {
     loading.value = false
@@ -84,7 +120,7 @@ onMounted(fetchCourses)
   max-width: 400px;
   margin: 50px auto;
   padding: 25px;
-  background-color: rgba(0,0,0,0.3);
+  background-color: rgba(0, 0, 0, 0.3);
   border-radius: 10px;
   color: white;
   font-family: Arial, sans-serif;
@@ -105,6 +141,7 @@ label {
   font-weight: bold;
 }
 
+input,
 select {
   padding: 8px;
   margin-bottom: 20px;
