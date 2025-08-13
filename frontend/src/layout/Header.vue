@@ -11,16 +11,12 @@
       <div class="account-dropdown">
         <span>Account ▾</span>
         <div class="dropdown-menu">
-          <router-link to="/dashboard">Dashboard</router-link>
-          <router-link to="/CourseManagement">Manage Courses</router-link>
-          <router-link to="/lesson/1">Lesson Player (sample)</router-link>
-          <router-link to="/profile">Profile / Settings</router-link>
+          <router-link to="/lesson/1">Lesson Player</router-link>
+          <router-link to="/profile">Profile Settings</router-link>
           <router-link to="/contact">Support</router-link>
-          <router-link to="/login">Login</router-link>
-          <router-link to="/signup">Signup</router-link>
-          <router-link to="/Quiz">Quiz</router-link>
-
           <router-link to="/StudentEnrollment">Student Enrollment</router-link>
+          <router-link to="/Quiz">Quiz</router-link>
+          <router-link to="/Login">Log Out</router-link>
         </div>
       </div>
     </nav>

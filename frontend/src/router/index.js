@@ -15,6 +15,7 @@ import EnrollmentDashboard from "@/views/EnrollmentDashboard.vue";
 import StudentEnrollment from "@/views/StudentEnrollment.vue";
 import Quiz from "@/views/Quiz.vue";
 import AdminQuiz from "@/views/AdminQuiz.vue";
+import AdminManagement from "@/views/AdminManagement.vue";
 
 const routes = [
     { path: '/', name: 'Home', component: Home },
@@ -33,6 +34,8 @@ const routes = [
     { path: '/UserManagement', name: 'UserManagement', component: UserManagement },
     { path: '/Quiz', name: 'Quiz', component: Quiz },
     { path: '/AdminQuiz', name: 'AdminQuiz', component: AdminQuiz },
+    { path: '/AdminManagement', name: 'AdminManagement', component: AdminManagement },
+
 
 
 ]

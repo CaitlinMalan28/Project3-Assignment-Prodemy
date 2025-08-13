@@ -24,6 +24,7 @@
           <a v-else :href="getImageUrl(course.id)" target="_blank">View PDF</a>
         </div>
 
+
         <div class="actions">
           <button @click="editCourse(course)">Edit</button>
           <button @click="deleteCourse(course.id)">Delete</button>

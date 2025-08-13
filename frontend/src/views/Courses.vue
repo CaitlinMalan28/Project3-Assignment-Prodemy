@@ -8,7 +8,8 @@
 
     <div class="courses-grid" v-else>
       <div class="course-card" v-for="course in courses" :key="course.id">
-        <img :src="course.imageUrl || placeholderImage" :alt="course.title" class="course-image" />
+        <!-- Always display image -->
+        <img :src="getCourseImage(course.id)" :alt="course.title" class="course-image" />
         <h2>{{ course.title }}</h2>
         <p>{{ course.description }}</p>
         <router-link :to="`/courses/${course.id}`" class="enroll-btn">View Course</router-link>
@@ -22,6 +23,11 @@ import { ref, onMounted } from 'vue'
 import axios from 'axios'
 
 const courses = ref([])
+const loading = ref(true)
+const error = ref(null)
+
+// Build image URL from backend
+const getCourseImage = (id) => `http://localhost:8080/courses/media/${id}`
 
 onMounted(async () => {
   try {
@@ -29,14 +35,16 @@ onMounted(async () => {
     courses.value = res.data.map(c => ({
       id: c.id,
       title: c.title,
-      description: c.description,
-      image: c.imageUrl || 'fallback.jpg'
+      description: c.description
+      // imageType not needed anymore
     }))
   } catch (e) {
     console.error('Failed to load courses', e)
+    error.value = 'Failed to load courses. Please try again later.'
+  } finally {
+    loading.value = false
   }
 })
-
 </script>
 
 <style scoped>
@@ -94,6 +102,7 @@ onMounted(async () => {
 .enroll-btn:hover {
   background-color: #00cc66;
 }
+
 .course-image {
   width: 100%;
   height: 160px;

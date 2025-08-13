@@ -38,6 +38,14 @@
           <p>Monitor student progress, engagement, and completion stats.</p>
           <button class="admin-btn" @click="goTo('/analytics')">View Reports</button>
         </div>
+        <div class="admin-tool">
+          <h3>Admin Management</h3>
+          <p>Monitor Admins progress.</p>
+          <button class="admin-btn" @click="goTo('/AdminManagement')">Manage Admins</button>
+        </div>
+
+
+
       </div>
     </div>
 
@@ -67,6 +75,7 @@ import time from '@/assets/time.jpg'
 import python from '@/assets/python.jpg'
 import application from '@/assets/application.jpg'
 import professionalE from '@/assets/professionalE.jpg'
+import AdminManagement from "@/views/AdminManagement.vue";
 
 const router = useRouter()
 

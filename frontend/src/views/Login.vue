@@ -38,11 +38,13 @@
 <script setup>
 import { ref } from 'vue'
 import axios from 'axios'
+import { useRouter } from 'vue-router'
 import logo from '@/assets/logo.png'
 
 const email = ref('')
 const password = ref('')
 const role = ref('')
+const router = useRouter()
 
 const handleLogin = async () => {
   if (!email.value || !password.value || !role.value) {
@@ -66,15 +68,27 @@ const handleLogin = async () => {
       password: password.value,
     })
 
-    console.log('Login success:', response.data)
+    const user = response.data
+    console.log('Login success:', user)
     alert('Login successful!')
-    // you can redirect the user or store token here
+
+    // Role-based redirection
+    if (user.role === 'ADMIN') {
+      router.push({ name: 'Dashboard' })
+    } else if (user.role === 'USER') {
+      router.push({ name: 'Home' })
+    } else {
+      alert('Unknown role, redirecting to Home')
+      router.push({ name: 'Home' })
+    }
+
   } catch (error) {
     console.error('Login failed:', error)
     alert('Login failed. Please check your credentials.')
   }
 }
 </script>
+
 
 
 <style scoped>
