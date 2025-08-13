@@ -27,6 +27,11 @@
           <p>Track who’s enrolled and approve or revoke access.</p>
           <button class="admin-btn" @click="goTo('/enrollment')">Enrollment Dashboard</button>
         </div>
+        <div class="admin-tool">
+          <h3>Quiz Management</h3>
+          <p>Create, edit, or delete quizzes for students.</p>
+          <button class="admin-btn" @click="goTo('/AdminQuiz')">Manage Quizzes</button>
+        </div>
 
         <div class="admin-tool">
           <h3>Reports & Analytics</h3>

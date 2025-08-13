@@ -13,6 +13,8 @@ import Analytics from "@/views/Analytics.vue";
 import UserManagement from "@/views/UserManagement.vue";
 import EnrollmentDashboard from "@/views/EnrollmentDashboard.vue";
 import StudentEnrollment from "@/views/StudentEnrollment.vue";
+import Quiz from "@/views/Quiz.vue";
+import AdminQuiz from "@/views/AdminQuiz.vue";
 
 const routes = [
     { path: '/', name: 'Home', component: Home },
@@ -29,6 +31,10 @@ const routes = [
     { path: '/enrollment', name: 'EnrollmentDashboard', component: EnrollmentDashboard },
     { path: '/StudentEnrollment', name: 'StudentEnrollment', component: StudentEnrollment },
     { path: '/UserManagement', name: 'UserManagement', component: UserManagement },
+    { path: '/Quiz', name: 'Quiz', component: Quiz },
+    { path: '/AdminQuiz', name: 'AdminQuiz', component: AdminQuiz },
+
+
 ]
 
 const router = createRouter({

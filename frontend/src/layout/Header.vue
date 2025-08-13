@@ -18,6 +18,8 @@
           <router-link to="/contact">Support</router-link>
           <router-link to="/login">Login</router-link>
           <router-link to="/signup">Signup</router-link>
+          <router-link to="/Quiz">Quiz</router-link>
+
           <router-link to="/StudentEnrollment">Student Enrollment</router-link>
         </div>
       </div>
