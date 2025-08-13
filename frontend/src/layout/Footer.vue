@@ -5,7 +5,7 @@
 </template>
 
 <script setup>
-// No JS needed
+
 </script>
 
 <style scoped>
@@ -14,6 +14,6 @@
   text-align: center;
   padding: 15px;
   color: white;
-  border-top: 1px solid #00ff88;
+  border-bottom: 1px solid #00ff88;
 }
 </style>

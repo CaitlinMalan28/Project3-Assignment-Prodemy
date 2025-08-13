@@ -62,9 +62,9 @@ const handleSignup = async () => {
 
   let endpoint = ''
   if (role.value === 'ADMIN') {
-    endpoint = 'http://localhost:8080/admins/register'  // note: changed from /login
+    endpoint = 'http://localhost:8080/admins/register'
   } else if (role.value === 'USER') {
-    endpoint = 'http://localhost:8080/customers/register'  // changed from /login
+    endpoint = 'http://localhost:8080/customers/register'
   } else {
     alert('Invalid role selected')
     return
@@ -76,25 +76,39 @@ const handleSignup = async () => {
       lastName: lastName.value,
       email: email.value,
       password: password.value,
-      confirmPassword: confirmPassword.value,  // include if backend expects it
+      confirmPassword: confirmPassword.value,
       role: role.value
     }, {
       headers: {
         'Content-Type': 'application/json'
       }
-    })
+    });
 
-    alert('Account created successfully!')
-    window.location.href = '/'  // or wherever you want to redirect
-  } catch (error) {
-    console.error('Signup failed:', error)
-    // Show detailed error if backend sends it
-    if (error.response && error) {
-      alert('Signup failed: ' + error)
+    alert('Account created successfully!');
+
+    // Get the user role from the response
+    const user = response.data;
+
+    if (user.role === 'ADMIN') {
+      // redirect admin to dashboard
+      window.location.href = '/dashboard';
+    } else if (user.role === 'STUDENT') {
+      // redirect student to home
+      window.location.href = '/';
     } else {
-      alert('Signup failed. Please try again.' + error)
+      alert('Unknown role, redirecting to home');
+      window.location.href = '/';
+    }
+
+  } catch (error) {
+    console.error('Signup failed:', error);
+    if (error.response && error.response.data) {
+      alert('Signup failed: ' + JSON.stringify(error.response.data));
+    } else {
+      alert('Signup failed. Please try again.');
     }
   }
+
 }
 </script>
 
