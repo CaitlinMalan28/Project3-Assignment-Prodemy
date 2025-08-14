@@ -66,6 +66,8 @@ const sendMessage = async () => {
     messages.value.pop()
     messages.value.push({ sender: 'agent', text: '❌ Something went wrong. Please try again.' })
     console.error(err)
+
+
   }
 }
 </script>
