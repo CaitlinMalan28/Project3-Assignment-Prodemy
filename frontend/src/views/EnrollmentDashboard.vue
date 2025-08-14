@@ -19,19 +19,29 @@
           <td>{{ enrollment.customerName }}</td>
           <td>{{ enrollment.courseTitle }}</td>
           <td>{{ enrollment.status }}</td>
-          <td>
-            <button
-                v-if="enrollment.status === 'PENDING'"
-                @click="approveEnrollment(enrollment.id)"
-            >
-              Approve
-            </button>
-            <button
-                v-if="enrollment.status === 'APPROVED'"
-                @click="rejectEnrollment(enrollment.id)"
-            >
-              Reject
-            </button>
+          <td class="action-buttons">
+            <div v-if="enrollment.status === 'PENDING'">
+              <button
+                  class="approve-btn"
+                  @click="approveEnrollment(enrollment.id)"
+              >
+                Approve
+              </button>
+              <button
+                  class="reject-btn"
+                  @click="rejectEnrollment(enrollment.id)"
+              >
+                Reject
+              </button>
+            </div>
+            <div v-else>
+              <button
+                  class="reset-btn"
+                  @click="rejectEnrollment(enrollment.id)"
+              >
+                Reset to Pending
+              </button>
+            </div>
           </td>
         </tr>
         </tbody>
@@ -123,5 +133,36 @@ onMounted(fetchEnrollments)
 .enrollment-list button:last-of-type {
   background-color: #ff4d4d;
   color: white;
+}
+.action-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.approve-btn {
+  background-color: #00cc66;
+  color: white;
+}
+
+.reject-btn {
+  background-color: #ff4d4d;
+  color: white;
+}
+
+.reset-btn {
+  background-color: #666;
+  color: white;
+}
+
+.action-buttons button {
+  padding: 5px 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  flex: 1;
+}
+
+.action-buttons button:hover {
+  opacity: 0.9;
 }
 </style>

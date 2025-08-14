@@ -3,10 +3,11 @@
     <h1 class="logo">Prodemy</h1>
     <nav class="nav-links">
       <router-link to="/">Home</router-link>
+      <router-link to="/Prodemy_Agent">Prodemy agent</router-link>
       <router-link to="/courses">Courses</router-link>
       <router-link to="/about-us">About Us</router-link>
       <router-link to="/contact">Contact</router-link>
-      <router-link to="/analytics">Analytics</router-link>
+
 
       <div class="account-dropdown">
         <span>Account ▾</span>
