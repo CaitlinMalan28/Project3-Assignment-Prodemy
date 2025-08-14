@@ -16,6 +16,7 @@ import StudentEnrollment from "@/views/StudentEnrollment.vue";
 import Quiz from "@/views/Quiz.vue";
 import AdminQuiz from "@/views/AdminQuiz.vue";
 import AdminManagement from "@/views/AdminManagement.vue";
+import Prodemy_Agent from "@/views/Prodemy_Agent.vue";
 
 const routes = [
     { path: '/', name: 'Home', component: Home },
@@ -35,6 +36,9 @@ const routes = [
     { path: '/Quiz', name: 'Quiz', component: Quiz },
     { path: '/AdminQuiz', name: 'AdminQuiz', component: AdminQuiz },
     { path: '/AdminManagement', name: 'AdminManagement', component: AdminManagement },
+    { path: '/Prodemy_Agent', name: 'Prodemy_Agent', component: Prodemy_Agent },
+
+
 
 
 
