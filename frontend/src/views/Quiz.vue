@@ -102,7 +102,7 @@ onMounted(fetchQuizzes);
 </script>
 
 <style scoped>
-/* Existing styles remain unchanged */
+
 .quiz-page {
   display: flex;
   flex-direction: column;
