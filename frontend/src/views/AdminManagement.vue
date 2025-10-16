@@ -19,21 +19,33 @@
       <tbody>
       <tr v-for="user in users" :key="user.id">
         <td>{{ user.id }}</td>
-        <td>{{ user.firstName }}</td>
-        <td>{{ user.lastName }}</td>
-        <td>{{ user.email }}</td>
+
+        <td>
+          <input type="text" v-model="user.firstName" />
+        </td>
+
+        <td>
+          <input type="text" v-model="user.lastName" />
+        </td>
+
+        <td>
+          <input type="email" v-model="user.email" />
+        </td>
+
         <td>
           <select v-model="user.role">
             <option value="USER">USER</option>
             <option value="ADMIN">ADMIN</option>
           </select>
         </td>
+
         <td>
           <button @click="updateUser(user)">Update</button>
           <button @click="deleteUser(user.id)">Delete</button>
         </td>
       </tr>
       </tbody>
+
     </table>
   </div>
 </template>
@@ -46,13 +58,14 @@ const users = ref([])
 const loading = ref(true)
 const error = ref('')
 
-const backendUrl = 'http://localhost:8080/admins/all' // Replace with your API endpoint
+const backendBase = 'http://localhost:8080/admins'
 
 const fetchUsers = async () => {
   loading.value = true
   try {
-    const res = await axios.get(`http://localhost:8080/admins/all`)
+    const res = await axios.get(`${backendBase}/all`)
     users.value = res.data
+    error.value = ''
   } catch (e) {
     console.error('Failed to load users', e)
     error.value = 'Failed to load users.'
@@ -63,8 +76,9 @@ const fetchUsers = async () => {
 
 const updateUser = async (user) => {
   try {
-    await axios.put(`http://localhost:8080/admins/update`, user)
+    await axios.post(`${backendBase}/update`, user)
     alert(`User ${user.id} updated!`)
+    fetchUsers()
   } catch (e) {
     console.error('Failed to update user', e)
     alert('Failed to update user')
@@ -74,7 +88,7 @@ const updateUser = async (user) => {
 const deleteUser = async (id) => {
   if (!confirm('Are you sure you want to delete this user?')) return
   try {
-    await axios.delete(`http://localhost:8080/admins/read/${id}`)
+    await axios.delete(`${backendBase}/delete/${id}`)
     alert('User deleted!')
     fetchUsers()
   } catch (e) {
@@ -119,6 +133,17 @@ onMounted(fetchUsers)
   border: 1px solid #00ff88;
   border-radius: 4px;
   padding: 5px;
+}
+
+.users-table input {
+  background: #2a2a2a;
+  font-size: 16px;
+  color: white;
+  border: 1px solid #00ff88;
+  border-radius: 4px;
+  padding: 5px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 button {

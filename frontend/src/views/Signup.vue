@@ -62,7 +62,7 @@ const handleSignup = async () => {
 
   let endpoint = ''
   if (role.value === 'ADMIN') {
-    endpoint = 'http://localhost:8080/admins/register'
+    endpoint = 'C'
   } else if (role.value === 'USER') {
     endpoint = 'http://localhost:8080/customers/register'
   } else {
