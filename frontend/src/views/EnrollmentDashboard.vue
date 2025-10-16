@@ -7,7 +7,7 @@
     <p v-if="message" :class="{ success: !error, error: error }">{{ message }}</p>
 
     <div class="enrollment-list" v-if="!loading && enrollments.length">
-      <h2>All Enrollments</h2>
+      <h2>All Enrolments</h2>
       <table>
         <thead>
         <tr>
