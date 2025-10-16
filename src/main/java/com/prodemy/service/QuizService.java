@@ -1,24 +1,41 @@
 package com.prodemy.service;
 
-import com.prodemy.model.*;
+import com.prodemy.model.Quiz;
 import com.prodemy.repository.QuizRepository;
-import org.springframework.beans.factory.annotation.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class QuizService {
+
+    private final QuizRepository quizRepository;
+
     @Autowired
-    private QuizRepository quizRepository;
+    public QuizService(QuizRepository quizRepository) {
+        this.quizRepository = quizRepository;
+    }
 
     public Quiz createQuiz(Quiz quiz) {
         return quizRepository.save(quiz);
     }
 
-    public List<Quiz> getQuizzesByCourse(Long courseId) {
-        Course course = new Course();
-        course.setCourse_id(courseId);
-        return quizRepository.findByCourse(course);
+    public List<Quiz> getAllQuizzes() {
+        return quizRepository.findAll();
+    }
+
+    public Quiz getQuizById(Long id) {
+        Optional<Quiz> quiz = quizRepository.findById(id);
+        return quiz.orElse(null);
+    }
+
+    public boolean deleteQuiz(Long id) {
+        if (quizRepository.existsById(id)) {
+            quizRepository.deleteById(id);
+            return true;
+        }
+        return false;
     }
 }
