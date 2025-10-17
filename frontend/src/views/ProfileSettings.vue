@@ -6,35 +6,94 @@
 
   <div class="profile-settings">
     <h1>Profile Settings</h1>
-    <form>
-      <input type="text" placeholder="Full Name" />
-      <input type="email" placeholder="Email" />
+    <form @submit.prevent="updateProfile">
+      <input
+          type="text"
+          v-model="currentUser.firstName"
+          placeholder="First Name"
+      />
+      <input
+          type="text"
+          v-model="currentUser.lastName"
+          placeholder="Last Name"
+      />
+      <input
+          type="email"
+          v-model="currentUser.email"
+          placeholder="Email"
+      />
 
       <div class="password-field">
         <input
-            :type="showSignupPassword ? 'text' : 'password'"
+            :type="showPassword ? 'text' : 'password'"
+            v-model="currentUser.password"
             placeholder="New Password"
         />
         <i
             class="fa-solid"
-            :class="showSignupPassword ? 'fa-eye-slash active' : 'fa-eye'"
+            :class="showPassword ? 'fa-eye-slash active' : 'fa-eye'"
             @click="togglePassword"
         ></i>
       </div>
 
       <button type="submit">Update</button>
+      <button type="submit">Log Out</button>
     </form>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import axios from 'axios'
 
-const showSignupPassword = ref(false)
+const showPassword = ref(false)
+const togglePassword = () => (showPassword.value = !showPassword.value)
 
-const togglePassword = () => {
-  showSignupPassword.value = !showSignupPassword.value
+const currentUser = ref({
+  id: null,
+  firstName: '',
+  lastName: '',
+  email: '',
+  password: '',
+  role: ''
+})
+
+// Fetch current user from backend/database
+onMounted(async () => {
+  try {
+    const userId = '1'
+    const res = await axios.get(`http://localhost:8080/admins/current/${userId}`)
+    currentUser.value = res.data
+  } catch (e) {
+    console.error('Failed to fetch current user:', e)
+  }
+})
+
+
+// Update profile
+const updateProfile = async () => {
+  try {
+    const res = await axios.post('http://localhost:8080/admins/update', currentUser.value)
+    alert('Profile updated!')
+    currentUser.value = res.data
+    localStorage.setItem('currentUser', JSON.stringify(res.data))
+  } catch (e) {
+    console.error('Failed to update profile', e)
+    alert('Update failed')
+  }
 }
+
+//Still in working-progress
+const logout = async () => {
+  try {
+    await axios.post('http://localhost:8080/admins/logout')
+    alert('Logged out!')
+    window.location.href = '/login'
+  } catch (e) {
+    console.error('Logout failed', e)
+  }
+}
+
 </script>
 
 <style scoped>
@@ -53,8 +112,9 @@ button {
   width: 100%;
   background: #2a2a2a;
   color: white;
-  border: none;
+  border: 1px solid #00ff88;
   border-radius: 4px;
+  font-size: 16px;
 }
 
 .password-field {
