@@ -7,21 +7,9 @@
   <div class="profile-settings">
     <h1>Profile Settings</h1>
     <form @submit.prevent="updateProfile">
-      <input
-          type="text"
-          v-model="currentUser.firstName"
-          placeholder="First Name"
-      />
-      <input
-          type="text"
-          v-model="currentUser.lastName"
-          placeholder="Last Name"
-      />
-      <input
-          type="email"
-          v-model="currentUser.email"
-          placeholder="Email"
-      />
+      <input type="text" v-model="currentUser.firstName" placeholder="First Name" />
+      <input type="text" v-model="currentUser.lastName" placeholder="Last Name" />
+      <input type="email" v-model="currentUser.email" placeholder="Email" />
 
       <div class="password-field">
         <input
@@ -37,7 +25,7 @@
       </div>
 
       <button type="submit">Update</button>
-      <button type="submit">Log Out</button>
+      <button type="button" @click="logout">Log Out</button>
     </form>
   </div>
 </template>
@@ -58,22 +46,21 @@ const currentUser = ref({
   role: ''
 })
 
-// Fetch current user from backend/database
-onMounted(async () => {
-  try {
-    const userId = '1'
-    const res = await axios.get(`http://localhost:8080/admins/current/${userId}`)
-    currentUser.value = res.data
-  } catch (e) {
-    console.error('Failed to fetch current user:', e)
+// ✅ Load user from localStorage
+onMounted(() => {
+  const savedUser = localStorage.getItem('currentUser')
+  if (savedUser) {
+    currentUser.value = JSON.parse(savedUser)
+  } else {
+    alert('No user logged in. Redirecting...')
+    window.location.href = '/login'
   }
 })
 
-
-// Update profile
+// ✅ Update user info
 const updateProfile = async () => {
   try {
-    const res = await axios.post('http://localhost:8080/admins/update', currentUser.value)
+    const res = await axios.put(`http://localhost:8080/customers/update`, currentUser.value)
     alert('Profile updated!')
     currentUser.value = res.data
     localStorage.setItem('currentUser', JSON.stringify(res.data))
@@ -83,17 +70,12 @@ const updateProfile = async () => {
   }
 }
 
-//Still in working-progress
-const logout = async () => {
-  try {
-    await axios.post('http://localhost:8080/admins/logout')
-    alert('Logged out!')
-    window.location.href = '/login'
-  } catch (e) {
-    console.error('Logout failed', e)
-  }
+// ✅ Log out user
+const logout = () => {
+  localStorage.removeItem('currentUser')
+  alert('Logged out!')
+  window.location.href = '/login'
 }
-
 </script>
 
 <style scoped>
@@ -140,15 +122,10 @@ button {
   color: #121212;
 }
 
-.password-field i.active {
-  color: #00ff88;
-}
-
 button {
   background-color: #00ff88;
   color: #121212;
   cursor: pointer;
-  padding: 10px;
   transition: all 0.3s ease;
 }
 
