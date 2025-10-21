@@ -38,7 +38,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import axios from 'axios'
+import { useAuthStore } from '@/stores/auth'
 import logo from '@/assets/logo.png'
 
 const firstName = ref('')
@@ -48,6 +48,8 @@ const password = ref('')
 const confirmPassword = ref('')
 const role = ref('')
 const agreed = ref(false)
+
+const authStore = useAuthStore()
 
 const handleSignup = async () => {
   if (!firstName.value || !lastName.value || !email.value || !password.value || !confirmPassword.value || !role.value || !agreed.value) {
@@ -60,58 +62,22 @@ const handleSignup = async () => {
     return
   }
 
-  let endpoint = ''
-  if (role.value === 'ADMIN') {
-    endpoint = 'http://localhost:8080/admins/register'
-  } else if (role.value === 'USER') {
-    endpoint = 'http://localhost:8080/customers/register'
-  } else {
-    alert('Invalid role selected')
-    return
-  }
-
   try {
-    const response = await axios.post(endpoint, {
+    await authStore.signup({
       firstName: firstName.value,
       lastName: lastName.value,
       email: email.value,
       password: password.value,
       confirmPassword: confirmPassword.value,
       role: role.value
-    }, {
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    });
-
-    alert('Account created successfully!');
-
-    // Get the user role from the response
-    const user = response.data;
-
-    if (user.role === 'ADMIN') {
-      // redirect admin to dashboard
-      window.location.href = '/dashboard';
-    } else if (user.role === 'STUDENT') {
-      // redirect student to home
-      window.location.href = '/';
-    } else {
-      alert('Unknown role, redirecting to home');
-      window.location.href = '/';
-    }
-
+    })
+    alert('Account created successfully! You are now logged in.')
   } catch (error) {
-    console.error('Signup failed:', error);
-    if (error.response && error.response.data) {
-      alert('Signup failed: ' + JSON.stringify(error.response.data));
-    } else {
-      alert('Signup failed. Please try again.');
-    }
+    console.error('Signup error:', error)
+    alert(error.message || 'Signup failed. Please try again.')
   }
-
 }
 </script>
-
 
 <style scoped>
 .signup-container {
@@ -160,6 +126,7 @@ form select {
   font-size: 1rem;
   background-color: #f6f6f6;
   color: #121212;
+  transition: all 0.25s ease;
 }
 
 form input::placeholder {

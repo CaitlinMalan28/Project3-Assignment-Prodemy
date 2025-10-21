@@ -1,5 +1,5 @@
 <template>
-  <div class="enrollment-form">
+  <div class="enrollment-card">
     <h2>Enroll in a Course</h2>
     <form @submit.prevent="submitEnrollment" class="form">
       <label for="firstName">First Name:</label>
@@ -20,7 +20,16 @@
           required
       />
 
-      <label for="course">Select Course:</label>
+      <label for="email">Email:</label>
+      <input
+          id="email"
+          type="email"
+          v-model="email"
+          placeholder="Enter your email"
+          required
+      />
+
+      <label for="course">Course:</label>
       <select id="course" v-model="selectedCourseTitle" required>
         <option disabled value="">-- Please select a course --</option>
         <option
@@ -34,7 +43,7 @@
 
       <button
           type="submit"
-          :disabled="loading || !firstName.trim() || !lastName.trim() || !selectedCourseTitle"
+          :disabled="loading || !firstName.trim() || !lastName.trim() || !email.trim() || !selectedCourseTitle"
       >
         {{ loading ? 'Submitting...' : 'Enroll' }}
       </button>
@@ -46,15 +55,34 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 import axios from 'axios'
 
+// User details
 const firstName = ref('')
 const lastName = ref('')
+const email = ref('')
+
+// Course selection
 const selectedCourseTitle = ref('')
 const courses = ref([])
+
 const loading = ref(false)
 const message = ref('')
 const success = ref(false)
+
+// Get query params from Courses.vue (if coming from course selection)
+const route = useRoute()
+
+onMounted(() => {
+  // Prefill user details if available in query params
+  if (route.query.firstName) firstName.value = route.query.firstName
+  if (route.query.lastName) lastName.value = route.query.lastName
+  if (route.query.email) email.value = route.query.email
+  if (route.query.courseTitle) selectedCourseTitle.value = route.query.courseTitle
+
+  fetchCourses()
+})
 
 async function fetchCourses() {
   try {
@@ -67,13 +95,8 @@ async function fetchCourses() {
 }
 
 async function submitEnrollment() {
-  if (!firstName.value.trim() || !lastName.value.trim()) {
-    message.value = 'Please enter both your first and last name.'
-    success.value = false
-    return
-  }
-  if (!selectedCourseTitle.value) {
-    message.value = 'Please select a course.'
+  if (!firstName.value.trim() || !lastName.value.trim() || !email.value.trim() || !selectedCourseTitle.value) {
+    message.value = 'All fields are required.'
     success.value = false
     return
   }
@@ -85,7 +108,8 @@ async function submitEnrollment() {
     const payload = {
       firstName: firstName.value.trim(),
       lastName: lastName.value.trim(),
-      courseName: selectedCourseTitle.value,
+      email: email.value.trim(),
+      courseName: selectedCourseTitle.value
     }
 
     const res = await axios.post(
@@ -96,9 +120,10 @@ async function submitEnrollment() {
     message.value = res.data || 'Enrollment successful!'
     success.value = true
 
-    // Clear form
+    // Optionally clear form
     firstName.value = ''
     lastName.value = ''
+    email.value = ''
     selectedCourseTitle.value = ''
   } catch (error) {
     if (error.response && error.response.data) {
@@ -111,24 +136,30 @@ async function submitEnrollment() {
     loading.value = false
   }
 }
-
-onMounted(fetchCourses)
 </script>
 
 <style scoped>
-.enrollment-form {
+.enrollment-card {
+  background: rgba(31, 31, 31, 0.4);
+  backdrop-filter: blur(60px);
+  padding: 40px 30px;
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
   max-width: 400px;
-  margin: 50px auto;
-  padding: 25px;
-  background-color: rgba(0, 0, 0, 0.3);
-  border-radius: 10px;
-  color: white;
-  font-family: Arial, sans-serif;
+  margin: 40px auto;
+  color: #fff;
+  transition: transform 0.2s;
 }
 
-.enrollment-form h2 {
-  margin-bottom: 20px;
+.enrollment-card:hover {
+  transform: translateY(-3px);
+}
+
+.enrollment-card h2 {
   text-align: center;
+  color: #00ff88;
+  margin-bottom: 25px;
+  font-weight: 600;
 }
 
 .form {
@@ -137,28 +168,39 @@ onMounted(fetchCourses)
 }
 
 label {
-  margin-bottom: 8px;
-  font-weight: bold;
+  margin-bottom: 5px;
+  font-size: 14px;
+  color: #aaa;
 }
 
 input,
 select {
-  padding: 8px;
+  padding: 12px 14px;
   margin-bottom: 20px;
-  border-radius: 6px;
-  border: none;
-  font-size: 1rem;
+  border-radius: 8px;
+  border: 1px solid #333;
+  background-color: #2a2a2a;
+  color: #fff;
+  font-size: 14px;
+  transition: border 0.3s, box-shadow 0.3s;
+}
+
+input:focus,
+select:focus {
+  border-color: #00ff88;
+  outline: none;
+  box-shadow: 0 0 6px rgba(0, 255, 136, 0.5);
 }
 
 button {
-  padding: 10px;
-  background-color: #00cc66;
+  padding: 14px;
+  border-radius: 10px;
   border: none;
-  border-radius: 6px;
-  color: white;
-  font-weight: bold;
+  background-color: #00ff88;
+  color: #121212;
+  font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background 0.3s, transform 0.2s;
 }
 
 button:disabled {
@@ -167,12 +209,13 @@ button:disabled {
 }
 
 button:hover:not(:disabled) {
-  background-color: #009944;
+  background-color: #00cc66;
+  transform: translateY(-2px);
 }
 
 p.success {
   margin-top: 15px;
-  color: #00cc66;
+  color: #00ff88;
   text-align: center;
 }
 

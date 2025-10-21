@@ -2,33 +2,49 @@
   <header class="header">
     <h1 class="logo">Prodemy</h1>
     <nav class="nav-links">
+      <!-- Always visible -->
       <router-link to="/">Home</router-link>
-      <router-link to="/Prodemy_Agent">Prodemy agent</router-link>
-      <router-link to="/courses">Courses</router-link>
       <router-link to="/about-us">About Us</router-link>
       <router-link to="/contact">Contact</router-link>
 
+      <!-- 🔹 Visible only when logged in -->
+      <template v-if="auth.user">
+        <router-link to="/Prodemy_Agent">Prodemy Agent</router-link>
+        <router-link to="/courses">Courses</router-link>
+      </template>
 
-      <div class="account-dropdown">
-        <span>Account ▾</span>
+      <!-- 🔹 Show account dropdown if logged in -->
+      <div v-if="auth.user" class="account-dropdown">
+        <span>{{ auth.user.firstName }} ▾</span>
         <div class="dropdown-menu">
           <router-link to="/lesson/1">Lesson Player</router-link>
           <router-link to="/profile">Profile Settings</router-link>
           <router-link to="/contact">Support</router-link>
           <router-link to="/StudentEnrollment">Student Enrollment</router-link>
           <router-link to="/Quiz">Quiz</router-link>
-          <router-link to="/Login">Log Out</router-link>
+          <a href="#" @click.prevent="logout">Log Out</a>
         </div>
+      </div>
+
+      <!-- 🔹 Show Login button when not logged in -->
+      <div v-else>
+        <router-link to="/login" class="login-btn">Login</router-link>
       </div>
     </nav>
   </header>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { useAuthStore } from '@/stores/auth'
+import { useRouter } from 'vue-router'
 
-// Simulated authentication state
-const isAuthenticated = ref(false)
+const auth = useAuthStore()
+const router = useRouter()
+
+const logout = () => {
+  auth.logout()
+  router.push('/login')
+}
 </script>
 
 <style scoped>
@@ -44,7 +60,7 @@ const isAuthenticated = ref(false)
 .logo {
   color: #00ff88;
   font-weight: bold;
-  font-size: 2.0rem;
+  font-size: 2rem;
 }
 
 .nav-links {
@@ -55,19 +71,22 @@ const isAuthenticated = ref(false)
 }
 
 .nav-links a {
-  color: lawngreen;
+  color: greenyellow;
   text-decoration: none;
   transition: color 0.2s;
+  font-weight: bold;
+  font-size: 1.1rem;
 }
 
 .nav-links a:hover {
   color: #00ff88;
+  font-weight: bold;
 }
 
 .account-dropdown {
   position: relative;
   cursor: pointer;
-  color: lawngreen;
+  color: greenyellow;
 }
 
 .account-dropdown:hover .dropdown-menu {
@@ -96,5 +115,18 @@ const isAuthenticated = ref(false)
 .dropdown-menu a:hover {
   background-color: #00ff88;
   color: black;
+}
+
+.login-btn {
+  background-color: #00ff88;
+  color: black;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: bold;
+  transition: background 0.2s;
+}
+
+.login-btn:hover {
+  background-color: #5affb5;
 }
 </style>

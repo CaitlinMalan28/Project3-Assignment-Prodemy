@@ -97,7 +97,8 @@ const sendMessage = async () => {
 }
 
 .chat-container {
-  background-color: #f9fafb;
+  background: rgba(31, 31, 31, 0.4);
+  backdrop-filter: blur(60px);
   border: 1px solid #e5e7eb;
   border-radius: 16px;
   padding: 20px;

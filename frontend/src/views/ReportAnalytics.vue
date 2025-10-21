@@ -6,7 +6,6 @@
 </template>
 
 <script setup>
-import python from '@/assets/python.jpg'
 </script>
 
 <style scoped>

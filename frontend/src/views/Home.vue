@@ -41,7 +41,6 @@
 </template>
 
 <script setup>
-// No logic needed yet
 </script>
 
 <style scoped>
@@ -70,7 +69,7 @@
 
 .hero p {
   font-size: 1.2rem;
-  color: #ccc;
+  color: black;
   margin-bottom: 20px;
 }
 
@@ -91,8 +90,8 @@
 .intro {
   max-width: 800px;
   margin-bottom: 60px;
-  font-size: 1.1rem;
-  color: #ccc;
+  font-size: 1.3rem;
+  color: black;
   line-height: 1.8;
   text-align: left;
 }
@@ -107,8 +106,8 @@
 }
 
 .feature-card {
-  background-color: #1e1e1e;
-  border: 1px solid #00ff88;
+  background: rgba(31, 31, 31, 0.4);
+  backdrop-filter: blur(60px);  border: 1px solid #00ff88;
   border-radius: 8px;
   padding: 20px;
   width: 280px;

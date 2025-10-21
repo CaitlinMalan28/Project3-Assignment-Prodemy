@@ -12,21 +12,25 @@
       <input v-model="userForm.password" type="password" placeholder="Password" :required="!userForm.id" />
       <select v-model="userForm.role" required>
         <option value="" disabled>Select Role</option>
-        <option value="STUDENT">Student</option>
-        <option value="INSTRUCTOR">Instructor</option>
+        <option value="USER">User</option>
+        <option value="ADMIN">Admin</option>
       </select>
-      <button type="submit" :disabled="loading">
-        {{ loading ? (userForm.id ? 'Updating...' : 'Creating...') : (userForm.id ? 'Update User' : 'Create User') }}
-      </button>
-      <button v-if="userForm.id" type="button" @click="resetForm">Cancel</button>
+      <div class="form-buttons">
+        <button type="submit" :disabled="loading">
+          {{ loading ? (userForm.id ? 'Updating...' : 'Creating...') : (userForm.id ? 'Update User' : 'Create User') }}
+        </button>
+        <button v-if="userForm.id" type="button" @click="resetForm" class="cancel-btn">Cancel</button>
+      </div>
     </form>
 
     <!-- User List -->
     <div class="user-list">
       <h2>All Users</h2>
-      <table>
+      <div v-if="loading" class="loading">Loading users...</div>
+      <table v-else>
         <thead>
         <tr>
+          <th>ID</th>
           <th>First Name</th>
           <th>Last Name</th>
           <th>Email</th>
@@ -36,17 +40,19 @@
         </thead>
         <tbody>
         <tr v-for="user in users" :key="user.id">
+          <td>{{ user.id }}</td>
           <td>{{ user.firstName }}</td>
           <td>{{ user.lastName }}</td>
           <td>{{ user.email }}</td>
           <td>{{ user.role }}</td>
           <td>
-            <button @click="editUser(user)">Edit</button>
-            <button @click="deleteUser(user.id)">Delete</button>
+            <button @click="editUser(user)" class="edit-btn">Edit</button>
+            <button @click="deleteUser(user.id)" class="delete-btn">Delete</button>
           </td>
         </tr>
         </tbody>
       </table>
+      <p v-if="!loading && users.length === 0" class="no-users">No users found.</p>
     </div>
   </div>
 </template>
@@ -75,8 +81,8 @@ async function fetchUsers() {
     loading.value = true
     const res = await axios.get('http://localhost:8080/customers/all')
     users.value = res.data
-  } catch {
-    message.value = 'Failed to load users.'
+  } catch (err) {
+    message.value = 'Failed to load users: ' + (err.response?.data || err.message)
     error.value = true
   } finally {
     loading.value = false
@@ -109,6 +115,14 @@ async function submitUser() {
     return
   }
 
+  // Email validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  if (!emailRegex.test(userForm.value.email)) {
+    message.value = 'Please enter a valid email address.'
+    error.value = true
+    return
+  }
+
   loading.value = true
   message.value = ''
   error.value = false
@@ -128,24 +142,27 @@ async function submitUser() {
         payload.password = userForm.value.password
       }
 
-      await axios.put(`http://localhost:8080/customers/update`, payload)
+      const response = await axios.put('http://localhost:8080/customers/update', payload)
       message.value = 'User updated successfully.'
     } else {
       // Create user
-      await axios.post('http://localhost:8080/customers/register', {
-        id: 0,
+      const payload = {
         firstName: userForm.value.firstName.trim(),
         lastName: userForm.value.lastName.trim(),
         email: userForm.value.email.trim(),
         password: userForm.value.password,
         role: userForm.value.role
-      })
+      }
+
+      const response = await axios.post('http://localhost:8080/customers/register', payload)
       message.value = 'User created successfully.'
     }
+
     await fetchUsers()
     resetForm()
   } catch (err) {
-    message.value = err.response?.data || 'Operation failed.'
+    const errorMessage = err.response?.data || err.message || 'Operation failed.'
+    message.value = typeof errorMessage === 'object' ? JSON.stringify(errorMessage) : errorMessage
     error.value = true
   } finally {
     loading.value = false
@@ -163,19 +180,24 @@ function editUser(user) {
   }
   message.value = ''
   error.value = false
+  // Scroll to form
+  window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
 async function deleteUser(id) {
   if (!confirm('Are you sure you want to delete this user?')) return
+
   loading.value = true
   message.value = ''
   error.value = false
+
   try {
     await axios.delete(`http://localhost:8080/customers/delete/${id}`)
     users.value = users.value.filter(u => u.id !== id)
     message.value = 'User deleted successfully.'
-  } catch {
-    message.value = 'Failed to delete user.'
+    error.value = false
+  } catch (err) {
+    message.value = 'Failed to delete user: ' + (err.response?.data || err.message)
     error.value = true
   } finally {
     loading.value = false

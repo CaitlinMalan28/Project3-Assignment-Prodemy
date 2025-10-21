@@ -9,7 +9,7 @@
         <input v-model="password" type="password" placeholder="Password" required />
 
         <select v-model="role" required>
-          <option value="" disabled selected>Select your role</option>
+          <option value="" disabled>Select your role</option>
           <option value="USER">Customer</option>
           <option value="ADMIN">Admin</option>
         </select>
@@ -37,14 +37,13 @@
 
 <script setup>
 import { ref } from 'vue'
-import axios from 'axios'
-import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 import logo from '@/assets/logo.png'
 
 const email = ref('')
 const password = ref('')
 const role = ref('')
-const router = useRouter()
+const authStore = useAuthStore()
 
 const handleLogin = async () => {
   if (!email.value || !password.value || !role.value) {
@@ -52,44 +51,15 @@ const handleLogin = async () => {
     return
   }
 
-  let endpoint = ''
-  if (role.value === 'ADMIN') {
-    endpoint = 'http://localhost:8080/admins/login'
-  } else if (role.value === 'USER') {
-    endpoint = 'http://localhost:8080/customers/login'
-  } else {
-    alert('Invalid role selected')
-    return
-  }
-
   try {
-    const response = await axios.post(endpoint, {
-      email: email.value,
-      password: password.value,
-    })
-
-    const user = response.data
-    console.log('Login success:', user)
+    await authStore.login(email.value, password.value, role.value)
     alert('Login successful!')
-
-    // Role-based redirection
-    if (user.role === 'ADMIN') {
-      router.push({ name: 'Dashboard' })
-    } else if (user.role === 'USER') {
-      router.push({ name: 'Home' })
-    } else {
-      alert('Unknown role, redirecting to Home')
-      router.push({ name: 'Home' })
-    }
-
   } catch (error) {
-    console.error('Login failed:', error)
-    alert('Login failed. Please check your credentials.')
+    console.error('Login error:', error)
+    alert(error.message || 'Login failed. Please check your credentials.')
   }
 }
 </script>
-
-
 
 <style scoped>
 .login-container {

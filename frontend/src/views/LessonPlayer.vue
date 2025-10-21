@@ -73,8 +73,8 @@ const selectLesson = (lesson) => {
 .lesson-player-page {
   color: white;
   padding: 40px 20px;
-  background: #121212;
-  min-height: 100vh;
+  background: rgba(31, 31, 31, 0.4);
+  backdrop-filter: blur(60px);  min-height: 100vh;
 }
 
 .page-title {
@@ -159,8 +159,8 @@ const selectLesson = (lesson) => {
 }
 
 .lesson-card {
-  background: #2a2a2a;
-  padding: 12px 15px;
+  background: rgba(31, 31, 31, 0.4);
+  backdrop-filter: blur(10px);  padding: 12px 15px;
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s;
