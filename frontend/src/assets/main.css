@@ -1,37 +1,71 @@
-@import './base.css';
+@import './base.css'; /* Your existing base styles */
 
+/* Tailwind imports */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Make html, body, and #app full height */
+html, body, #app {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+/* Your existing styles */
 #app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  font-weight: normal;
+    width: 100%; /* allow full width */
+    max-width: 1280px; /* optional: keeps content centered on large screens */
+    margin: 0 auto;
+    padding: 2rem;
+    font-weight: normal;
+    display: flex; /* change from grid if you want flexibility */
+    flex-direction: column; /* stack header, main, footer vertically */
 }
 
 a,
 .green {
-  text-decoration: none;
-  color: hsla(160, 100%, 37%, 1);
-  transition: 0.4s;
-  padding: 3px;
+    text-decoration: none;
+    color: hsla(160, 100%, 37%, 1);
+    transition: 0.4s;
+    padding: 3px;
 }
 
 @media (hover: hover) {
-  a:hover {
-    background-color: hsla(160, 100%, 37%, 0.2);
-  }
+    a:hover {
+        background-color: hsla(160, 100%, 37%, 0.2);
+    }
 }
 
 @media (min-width: 1024px) {
-  body {
-    background-color: #121212;
-    color: white;
-    font-family: 'Segoe UI', sans-serif;
-  }
+    body {
+        background-color: #121212;
+        color: white;
+        font-family: 'Segoe UI', sans-serif;
+    }
 
+    #app {
+        display: flex; /* use flex instead of grid for full height layout */
+        flex-direction: column;
+        min-height: 100vh; /* ensures app fills viewport height */
+        padding: 0 2rem;
+    }
+}
 
-  #app {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding: 0 2rem;
-  }
+/* Optional: main content fills remaining space */
+main {
+    flex: 1; /* allows main to grow between header and footer */
+    padding: 1rem 0;
+}
+
+/* Optional: full-width layout for plugin panels or sidebars */
+.layout {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.app-body {
+    flex: 1;
+    display: flex;
 }

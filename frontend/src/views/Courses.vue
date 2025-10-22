@@ -6,13 +6,12 @@
     <div v-if="loading">Loading courses...</div>
     <div v-else-if="error" class="error">{{ error }}</div>
 
-    <div class="courses-grid" v-else>
-      <div class="course-card" v-for="course in courses" :key="course.id">
-        <!-- Always display image -->
+    <div v-else class="courses-grid">
+      <div v-for="course in courses" :key="course.id" class="course-card">
         <img :src="getCourseImage(course.id)" :alt="course.title" class="course-image" />
         <h2>{{ course.title }}</h2>
         <p>{{ course.description }}</p>
-        <router-link :to="`/courses/${course.id}`" class="enroll-btn">View Course</router-link>
+        <button class="enroll-btn" @click="enroll(course)">Enroll Course</button>
       </div>
     </div>
   </div>
@@ -20,7 +19,12 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 import axios from 'axios'
+
+const router = useRouter()
+const auth = useAuthStore()
 
 const courses = ref([])
 const loading = ref(true)
@@ -29,6 +33,27 @@ const error = ref(null)
 // Build image URL from backend
 const getCourseImage = (id) => `http://localhost:8080/courses/media/${id}`
 
+// Navigate to enrollment page with user + course info
+function enroll(course) {
+  if (!auth.user) {
+    alert('Please log in to enroll in a course.')
+    router.push('/Login')
+    return
+  }
+
+  router.push({
+    name: 'StudentEnrollment',
+    query: {
+      courseId: course.id,
+      courseTitle: course.title,
+      firstName: auth.user.firstName,
+      lastName: auth.user.lastName,
+      email: auth.user.email,
+    },
+  })
+}
+
+// Fetch all courses from backend
 onMounted(async () => {
   try {
     const res = await axios.get('http://localhost:8080/courses/all')
@@ -36,10 +61,9 @@ onMounted(async () => {
       id: c.id,
       title: c.title,
       description: c.description
-      // imageType not needed anymore
     }))
-  } catch (e) {
-    console.error('Failed to load courses', e)
+  } catch (err) {
+    console.error('Failed to load courses', err)
     error.value = 'Failed to load courses. Please try again later.'
   } finally {
     loading.value = false
@@ -61,7 +85,7 @@ onMounted(async () => {
 }
 
 .subtitle {
-  color: #ccc;
+  color: black;
   margin-bottom: 40px;
 }
 
@@ -94,8 +118,8 @@ onMounted(async () => {
   background-color: #00ff88;
   color: #121212;
   border-radius: 4px;
-  text-decoration: none;
   font-weight: bold;
+  cursor: pointer;
   transition: background 0.3s;
 }
 

@@ -61,7 +61,7 @@
 
 .intro {
   font-size: 1.1rem;
-  color: #ccc;
+  color: black;
   margin: 20px auto;
   max-width: 800px;
   line-height: 1.8;
@@ -77,8 +77,8 @@
 }
 
 .card {
-  background-color: #1e1e1e;
-  border: 1px solid #00ff88;
+  background: rgba(31, 31, 31, 0.4);
+  backdrop-filter: blur(60px);  border: 1px solid #00ff88;
   border-radius: 10px;
   padding: 24px;
   width: 300px;
@@ -99,7 +99,7 @@
 
 .card p {
   font-size: 1rem;
-  color: #ccc;
+  color: white;
   line-height: 1.5;
 }
 </style>
