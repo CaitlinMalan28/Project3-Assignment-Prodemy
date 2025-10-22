@@ -1,135 +1,225 @@
 <template>
-  <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
-  />
+  <div class="profile-container">
+    <div class="profile-card">
+      <h2>Profile Settings</h2>
 
-  <div class="profile-settings">
-    <h1>Profile Settings</h1>
-    <form @submit.prevent="updateProfile">
-      <input type="text" v-model="currentUser.firstName" placeholder="First Name" />
-      <input type="text" v-model="currentUser.lastName" placeholder="Last Name" />
-      <input type="email" v-model="currentUser.email" placeholder="Email" />
+      <form @submit.prevent="onSubmit">
+        <div class="input-row">
+          <div class="input-group">
+            <label for="firstName">First name</label>
+            <input id="firstName" v-model="form.firstName" type="text" placeholder="First name" />
+          </div>
 
-      <div class="password-field">
-        <input
-            :type="showPassword ? 'text' : 'password'"
-            v-model="currentUser.password"
-            placeholder="New Password"
-        />
-        <i
-            class="fa-solid"
-            :class="showPassword ? 'fa-eye-slash active' : 'fa-eye'"
-            @click="togglePassword"
-        ></i>
-      </div>
+          <div class="input-group">
+            <label for="lastName">Last name</label>
+            <input id="lastName" v-model="form.lastName" type="text" placeholder="Last name" />
+          </div>
+        </div>
 
-      <button type="submit">Update</button>
-      <button type="button" @click="logout">Log Out</button>
-    </form>
+        <div class="input-group">
+          <label for="email">Email</label>
+          <input id="email" v-model="form.email" type="email" placeholder="you@example.com" />
+        </div>
+
+        <div class="input-group">
+          <label for="newPassword">New password</label>
+          <input id="newPassword" v-model="form.newPassword" type="password" placeholder="••••••••" />
+          <small v-if="passwordHelp" class="help">{{ passwordHelp }}</small>
+        </div>
+
+        <div class="input-group">
+          <label for="role">Role</label>
+          <select id="role" v-model="form.role" disabled>
+            <option value="USER">USER</option>
+            <option value="ADMIN">ADMIN</option>
+          </select>
+        </div>
+
+        <button type="submit" :disabled="loading">
+          {{ loading ? 'Saving...' : 'Update Profile' }}
+        </button>
+
+        <p v-if="success" class="success">Profile updated successfully.</p>
+        <p v-if="error" class="error">{{ error }}</p>
+      </form>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import axios from 'axios'
+import { ref, reactive, onMounted } from 'vue'
+import { useAuthStore } from '@/stores/auth'
 
-const showPassword = ref(false)
-const togglePassword = () => (showPassword.value = !showPassword.value)
+const auth = useAuthStore()
+const loading = ref(false)
+const success = ref(false)
+const error = ref('')
+const passwordHelp = ref('Leave blank to keep your current password.')
 
-const currentUser = ref({
+const form = reactive({
   id: null,
   firstName: '',
   lastName: '',
   email: '',
-  password: '',
-  role: ''
+  newPassword: '',
+  role: '',
 })
 
-// ✅ Load user from localStorage
+// ✅ Auto-assign user details from auth store
 onMounted(() => {
-  const savedUser = localStorage.getItem('currentUser')
-  if (savedUser) {
-    currentUser.value = JSON.parse(savedUser)
+  if (auth.user) {
+    form.id = auth.user.id
+    form.firstName = auth.user.firstName || ''
+    form.lastName = auth.user.lastName || ''
+    form.email = auth.user.email || ''
+    form.role = auth.user.role || 'USER'
   } else {
-    alert('No user logged in. Redirecting...')
-    window.location.href = '/login'
+    error.value = 'You must be logged in to view your profile.'
   }
 })
 
-// ✅ Update user info
-const updateProfile = async () => {
-  try {
-    const res = await axios.put(`http://localhost:8080/customers/update`, currentUser.value)
-    alert('Profile updated!')
-    currentUser.value = res.data
-    localStorage.setItem('currentUser', JSON.stringify(res.data))
-  } catch (e) {
-    console.error('Failed to update profile', e)
-    alert('Update failed')
-  }
-}
+async function onSubmit() {
+  error.value = ''
+  success.value = false
 
-// ✅ Log out user
-const logout = () => {
-  localStorage.removeItem('currentUser')
-  alert('Logged out!')
-  window.location.href = '/login'
+  if (!form.firstName || !form.lastName || !form.email) {
+    error.value = 'First name, last name, and email are required.'
+    return
+  }
+
+  const payload = {
+    id: form.id,
+    firstName: form.firstName,
+    lastName: form.lastName,
+    email: form.email,
+    role: form.role,
+  }
+
+  if (form.newPassword && form.newPassword.length >= 6) {
+    payload.password = form.newPassword
+  } else if (form.newPassword && form.newPassword.length < 6) {
+    error.value = 'Password must be at least 6 characters.'
+    return
+  }
+
+  try {
+    loading.value = true
+
+    const base =
+        form.role === 'ADMIN'
+            ? 'http://localhost:8080/admins'
+            : 'http://localhost:8080/customers'
+
+    const res = await fetch(`${base}/update`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    })
+
+    if (!res.ok) throw new Error('Failed to update profile.')
+    const updatedUser = await res.json()
+
+    // ✅ Update store and localStorage
+    auth.user = updatedUser
+    localStorage.setItem('user', JSON.stringify(updatedUser))
+
+    success.value = true
+    form.newPassword = ''
+  } catch (err) {
+    console.error(err)
+    error.value = err.message || 'Failed to update profile.'
+  } finally {
+    loading.value = false
+  }
 }
 </script>
 
 <style scoped>
-.profile-settings {
-  color: white;
-  padding: 20px;
-  max-width: 500px;
-  margin: auto;
+.profile-card {
+  background: rgba(31, 31, 31, 0.4);
+  backdrop-filter: blur(60px);
+  padding: 35px 30px;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  max-width: 650px;
+  margin: 50px auto;
+  color: #fff;
+}
+
+.profile-card h2 {
+  text-align: center;
+  color: #00ff88;
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+.input-row {
+  display: flex;
+  gap: 12px;
+}
+
+.input-group {
+  margin-bottom: 16px;
+  flex: 1;
+  text-align: left;
+}
+
+.input-group label {
+  display: block;
+  font-size: 13px;
+  margin-bottom: 6px;
+  color: #aaa;
 }
 
 input,
-button {
-  display: block;
-  margin: 10px 0;
-  padding: 10px;
+select {
   width: 100%;
-  background: #2a2a2a;
-  color: white;
-  border: 1px solid #00ff88;
-  border-radius: 4px;
-  font-size: 16px;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #333;
+  background-color: #2a2a2a;
+  color: #fff;
+  font-size: 14px;
+  transition: border 0.2s;
 }
 
-.password-field {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.password-field input {
-  flex: 1;
-}
-
-.password-field i {
-  position: absolute;
-  right: 10px;
-  cursor: pointer;
-  color: #00ff88;
-  transition: all 0.3s ease;
-  font-size: 18px;
-}
-
-.password-field i:hover {
-  color: #121212;
+input:focus,
+select:focus {
+  border-color: #00ff88;
+  outline: none;
 }
 
 button {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
   background-color: #00ff88;
   color: #121212;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: background 0.2s, transform 0.1s;
 }
 
-button:hover {
-  background-color: #00cc70;
+button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.success {
+  margin-top: 12px;
+  color: #7ef0a4;
+}
+
+.error {
+  margin-top: 12px;
+  color: #ff7b7b;
+}
+
+.help {
+  display: block;
+  margin-top: 6px;
+  color: #888;
+  font-size: 12px;
 }
 </style>
