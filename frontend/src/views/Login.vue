@@ -62,7 +62,6 @@ const handleLogin = async () => {
 </script>
 
 <style scoped>
-/* same styling as you had */
 .login-container {
   display: flex;
   flex-direction: row;
@@ -86,5 +85,164 @@ const handleLogin = async () => {
   border-radius: 20px 0 0 20px;
 }
 
-/* rest of your existing styles */
+.form-section h2 {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+  color: #1e1e1e;
+}
+
+.form-section p {
+  margin-bottom: 30px;
+  font-weight: 500;
+  color: #2b2b2b;
+  font-size: 1rem;
+}
+
+form input,
+form select {
+  width: 100%;
+  padding: 14px 16px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 14px;
+  font-size: 1rem;
+  background-color: #f6f6f6;
+  color: #121212;
+  transition: all 0.25s ease;
+}
+
+form select:focus,
+form input:focus {
+  outline: none;
+  border-color: #5cae29;
+  box-shadow: 0 0 6px #5cae2966;
+  background-color: #fff;
+}
+
+form select:hover,
+form input:hover {
+  border-color: #5cae29;
+}
+
+form input::placeholder {
+  color: #777;
+}
+
+button {
+  background-color: #5cae29;
+  color: white;
+  border: none;
+  padding: 14px;
+  width: 100%;
+  border-radius: 14px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1rem;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+button:hover {
+  background-color: #489c1f;
+  transform: translateY(-1px);
+}
+
+.divider {
+  text-align: center;
+  margin: 30px 0 20px;
+  position: relative;
+  font-weight: 600;
+  color: #444;
+  font-size: 0.9rem;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  position: absolute;
+  height: 1px;
+  background-color: #bbb;
+  top: 50%;
+  width: 40%;
+}
+
+.divider::before {
+  left: 0;
+}
+
+.divider::after {
+  right: 0;
+}
+
+.divider span {
+  padding: 0 10px;
+  background: #9eff80;
+  z-index: 1;
+  position: relative;
+  border-radius: 12px;
+}
+
+.social-login button {
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 12px;
+  font-weight: bold;
+  font-size: 0.95rem;
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.google {
+  background-color: white;
+  color: #333;
+}
+
+.google:hover {
+  background-color: #e5e5e5;
+}
+
+.apple {
+  background-color: #000;
+  color: white;
+}
+
+.apple:hover {
+  background-color: #333;
+}
+
+.signup-link {
+  text-align: center;
+  margin-top: 25px;
+  font-size: 0.95rem;
+  color: #333;
+}
+
+.signup-link a {
+  color: #007bff;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.signup-link a:hover {
+  text-decoration: underline;
+}
+
+.graphic-section {
+  flex: 1;
+  background-color: #0d0d0d;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  border-radius: 0 20px 20px 0;
+}
+
+.graphic-section img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 0 20px 20px 0;
+}
 </style>

@@ -66,7 +66,6 @@
         </td>
       </tr>
       </tbody>
-
     </table>
 
     <p v-if="successMessage" class="success">{{ successMessage }}</p>
